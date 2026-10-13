@@ -300,7 +300,7 @@ function Sandbox({
             key={g.id}
             data-action={g.id}
             data-outcome={g.outcome}
-            className={`grid grid-cols-[5.5rem_minmax(0,1fr)] items-baseline gap-2 rounded px-2 py-0.5 ${i === s.step ? "bg-white ring-1 ring-neutral-300 dark:bg-neutral-950 dark:ring-neutral-700" : ""} ${i > s.step ? "opacity-60" : ""}`}
+            className={`grid grid-cols-[5.5rem_minmax(0,1fr)] items-baseline gap-2 rounded px-2 py-0.5 ${i === s.step ? "bg-white ring-1 ring-neutral-300 dark:bg-neutral-950 dark:ring-neutral-700" : ""}`}
           >
             <span className="whitespace-nowrap font-mono">
               {i <= s.step

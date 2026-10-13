@@ -230,7 +230,11 @@ function Context({
         <Choice
           label="Task"
           value={plan}
-          options={K.PLAN_ORDER.map((p) => ({
+          // the default task first: every other choice re-runs the animation
+          options={[
+            "notes_then_page",
+            ...K.PLAN_ORDER.filter((p) => p !== "notes_then_page"),
+          ].map((p) => ({
             value: p,
             label: K.PLANS[p]!.title as string,
           }))}

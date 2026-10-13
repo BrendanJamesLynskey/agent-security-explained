@@ -266,7 +266,11 @@ function Boundary({
           <Choice
             label="Task"
             value={plan}
-            options={K.PLAN_ORDER.map((p) => ({
+            // the default task first: every other choice re-runs the animation
+            options={[
+              "reply_from_notes",
+              ...K.PLAN_ORDER.filter((p) => p !== "reply_from_notes"),
+            ].map((p) => ({
               value: p,
               label: K.PLANS[p]!.title as string,
             }))}

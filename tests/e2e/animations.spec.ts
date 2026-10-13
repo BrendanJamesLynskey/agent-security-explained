@@ -148,8 +148,8 @@ test.describe("reduced motion", () => {
 test("animations play when scrolled into view and pause when scrolled away", async ({
   page,
 }) => {
-  await page.goto("/learn/01-what-an-eval-is");
-  const fig = page.getByTestId("loop-widget");
+  await page.goto("/learn/01-trust-boundaries");
+  const fig = page.getByTestId("boundary-widget");
   await expect(fig).toBeVisible({ timeout: ENGINE_TIMEOUT });
   await fig.scrollIntoViewIfNeeded();
   await expect(fig).toHaveAttribute("data-playing", "true");
@@ -160,8 +160,8 @@ test("animations play when scrolled into view and pause when scrolled away", asy
 test("touching the scrub bar pauses, even on the step already shown", async ({
   page,
 }) => {
-  await page.goto("/learn/01-what-an-eval-is");
-  const fig = page.getByTestId("loop-widget");
+  await page.goto("/learn/01-trust-boundaries");
+  const fig = page.getByTestId("boundary-widget");
   await expect(fig).toBeVisible({ timeout: ENGINE_TIMEOUT });
   await fig.scrollIntoViewIfNeeded();
   await expect(fig).toHaveAttribute("data-playing", "true");
