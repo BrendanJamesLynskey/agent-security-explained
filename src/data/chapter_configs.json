@@ -1,0 +1,7 @@
+{
+  "boundary": { "default": "reply_from_notes" },
+  "context": { "default": "notes_then_page" },
+  "trifecta": {},
+  "privilege": {},
+  "sandbox": { "default": ["fs_scope", "container", "egress"] }
+}

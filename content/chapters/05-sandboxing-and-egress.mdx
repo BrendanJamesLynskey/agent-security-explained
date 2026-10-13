@@ -1,0 +1,49 @@
+<SandboxWidget>
+  <Eq
+    label="An action reaches its target only if no active layer stops it"
+    tex="\begin{gathered} \htmlClass{hl-reach}{\text{reaches}(a)} \iff \bigwedge_{L \,\in\, \text{active}} \lnot\,\text{stops}_L(a) \\ L \in \{\htmlClass{hl-scope}{\text{file scope}},\ \htmlClass{hl-container}{\text{container}},\ \htmlClass{hl-egress}{\text{allow-list}}\} \end{gathered}"
+  />
+</SandboxWidget>
+
+<Layer kind="concept">
+
+The policy of chapters 1 to 4 decides which **calls** an agent may make. A sandbox works one level down: it limits what a tool's **process** can do once it runs, whatever the call asked for. That matters most for tools that run code (a shell, a test runner, a package installer), because code can do anything its process is allowed to.
+
+The animation puts one such process inside three layers, each drawn as a boundary. The **file-system scope** limits file access to the workspace. A **container** gives the process its own file system and process space with only the workspace mounted, so the user's home directory is invisible and a process it starts stays inside. A **network allow-list** at the host's edge lets connections reach only the package registry. The process tries <V of="consts.actions" fmt="int" /> actions; the task (run the tests, install a package) needs <V of="sb.needed" fmt="int" /> of them.
+
+With no sandbox all <V of="sb.f0.open" fmt="int" /> unneeded actions get through. Each layer closes some: the file scope stops reading the home directory and writing system files, the container also stops a process escaping to the host, and the allow-list stops connections to any other host. With all three on, <V of="sb.f3.stopped" fmt="int" /> of the unneeded actions are stopped, the task still works, and <V of="sb.f3.open" fmt="int" /> gets through: an **upload to the allow-listed registry**. The allow-list checks where a connection goes, not what it carries, so any destination that accepts writes is a way out. Claude Code's sandboxing documentation makes the same point: "Allowing broad domains such as github.com can create paths for data exfiltration", and "Effective sandboxing requires both filesystem and network isolation" ([Claude Code docs, sandboxing](https://code.claude.com/docs/en/sandboxing), opened 2026-10-14). That residual is what the label policy of chapter 1 covers: it sees the data, not the connection. Turn layers off to see which actions each one alone would stop.
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The actions, zones and layers are abstract: real sandboxes (containers and virtual machines, Linux Landlock and seccomp, macOS Seatbelt, network proxies) differ in what they can see and enforce, and each has its own escape hatches. The engine models only which action each layer's rule matches.
+
+</Callout>
+
+<Layer kind="maths">
+
+Each layer $L$ is a predicate $\text{stops}_L(a)$ on actions, and an action gets through a stack of layers only if no active layer stops it. So the set of actions that get through can only shrink as layers are added (the engine's tests check this on all $2^{3}$ subsets of the layers), and layers that stop the same action overlap: with the file scope on, the container adds only the process escape. A sandbox is worth judging by two counts: the unneeded actions still open, and the needed actions it breaks. Here the second is zero for every subset of layers, because each layer was configured from the task; a stricter allow-list without the registry would stop the package install and break the task. Part two weighs that cost against the published effect of each defence.
+
+</Layer>
+
+<Layer kind="code">
+
+The allow-list's rule, cut from the vendored engine (`policy/sandbox.ts`): it looks at the destination only.
+
+```ts
+if (lid === "egress") {
+  if (action.kind === "net" && !layer.allow.includes(action.dest)) return `${action.dest} is not on the allow-list`;
+  return null;
+}
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Harnesses Explained: hooks and sandboxing](https://agent-harnesses-explained.vercel.app/learn/07-hooks-and-sandboxing), the sandbox around the harness's shell, step by step.
+- [LLM Hub: Computer Use](https://brendanjameslynskey.github.io/LLM_Hub_Computer_Use/): containers and virtual machines for agents that drive a whole computer.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
+
+</Callout>
