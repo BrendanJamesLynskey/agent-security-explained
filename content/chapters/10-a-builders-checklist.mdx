@@ -1,0 +1,54 @@
+<ChecklistWidget>
+  <Eq
+    label="A design's score is the number of the nine checks it passes; each check is measured by the engine on the benign suite"
+    tex="\text{score} = \sum_{k=1}^{9} \htmlClass{hl-pass}{\big[\, \htmlClass{hl-check}{\text{check}_k(\text{design})} = \text{pass} \,\big]}"
+  />
+</ChecklistWidget>
+
+<Layer kind="concept">
+
+The chapters reduce to nine questions to ask of any agent design. Each is measured here, not answered by hand: choose a design in the animation (a defence from [chapter 9](/learn/09-the-frontier), whether every write and send needs approval, and which sandbox layers are on) and the engine audits it on the benign suite, against an adaptive attacker, one check per step.
+
+1. **Labels** ([chapter 1](/learn/01-trust-boundaries)): does every value carry where it came from and how secret it is, and is every call checked against a policy?
+2. **Untrusted control** ([chapter 2](/learn/02-untrusted-input)): can a tool result choose a write or send that nothing checks?
+3. **The trifecta** ([chapter 3](/learn/03-the-lethal-trifecta)): does any task hold private data, untrusted input and a way out with nothing to stop the flow?
+4. **Least privilege** ([chapter 4](/learn/04-least-privilege)): does each task hold only the tools, scopes and destinations it needs, with tokens bound to one audience?
+5. **The sandbox** ([chapter 5](/learn/05-sandboxing-and-egress)): is code confined by a file scope, a container and an egress allow-list?
+6. **Detection** ([chapter 6](/learn/06-detection-is-not-enough)): are detectors one layer among several, never the only defence?
+7. **Structure** ([chapter 7](/learn/07-designs-that-make-it-structural)): is the plan fixed before any untrusted data is read?
+8. **Humans** ([chapter 8](/learn/08-humans-in-the-loop)): are prompts few enough that each one is read?
+9. **The frontier** ([chapter 9](/learn/09-the-frontier)): is the design on the frontier, within a risk budget of <V of="ck.budget" fmt="pct" /> per task?
+
+The default design (planning in advance with the label policy and least privilege, and all three sandbox layers) passes <V of="ck.passed" fmt="int" /> of the nine, finishing <V of="ck.utility" fmt="pct1" /> of the tasks with a risk of <V of="ck.risk" fmt="pct1" /> per task. Two checks warn, and both are honest. Check 2 is <V of="ck.verdict.ch2" fmt="raw" />: tasks that branch on what they read let untrusted data steer their last step, and the policy allows some of those calls. Check 3 is <V of="ck.verdict.ch3" fmt="raw" />: tasks that need private data, untrusted input and a send still hold all three; the policy denies the flow out, but the circles are there. Turn on approval for every write and send and check 2 becomes <V of="ck.approve.verdict.ch2" fmt="raw" />, while check 8 becomes <V of="ck.approve.verdict.ch8" fmt="raw" /> (<V of="ck.approve.prompts" fmt="f2" /> prompts per task). No design passes all nine on this suite: that is the frontier's lesson in another form. Try the others, from no defence at all to detectors alone, and follow each check back to its chapter.
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The thresholds behind each verdict (under 10% of tasks with an unchecked route to warn rather than fail, half a prompt per task to pass, the <V of="ck.budget" fmt="pct" /> risk budget) are illustrative choices, as are the suite and the parameters of [chapter 9](/learn/09-the-frontier). The checks are a summary of this site, not a standard; real reviews also cover what the engine leaves out, such as logging, secrets handling and incident response.
+
+</Callout>
+
+<Layer kind="maths">
+
+Each check is a function of the design measured on the suite of $N$ tasks: for example check 2 is the share of tasks whose best route passes with probability 1, check 4 the mean number of unneeded tools per task, $\frac{1}{N}\sum_t |\text{grant}(t) \setminus \text{needed}(t)|$, check 8 the mean prompts per task, and check 9 asks whether the design's point (tasks finished, risk, prompts) is beaten by any defence on the adaptive frontier, and whether its risk is under the budget. The score is the number of passes. The engine's tests check that no defence scores higher than the default design, and that the checks are the same in Python and in the browser for every defence, with and without approvals, with and without the sandbox.
+
+</Layer>
+
+<Layer kind="code">
+
+Check 7, cut from the vendored engine (`policy/study.ts`): planned in advance passes, a classic agent behind a policy warns, and no policy fails.
+
+```ts
+verdict: d.mode === "dataflow" ? "pass" : d.policy ? "warn" : "fail",
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Harnesses Explained](https://agent-harnesses-explained.vercel.app), [Agent Protocols Explained](https://agent-protocols-explained.vercel.app) and [Agent Orchestration Explained](https://agent-orchestration-explained.vercel.app): the harness, the wire and the workflow these checks apply to.
+- [OAuth for MCP](https://brendanjameslynskey.github.io/OAuth_for_MCP/): audience-bound tokens in practice.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/) and [LLM Hub: MCP](https://brendanjameslynskey.github.io/LLM_Hub_MCP/).
+
+</Callout>

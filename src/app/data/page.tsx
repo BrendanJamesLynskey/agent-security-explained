@@ -8,12 +8,12 @@ import type { ReactNode } from "react";
 import { MdxTable } from "@/components/ui/MdxTable";
 import { P, type Obj } from "@/lib/engine";
 import { tree } from "@/lib/security/values";
-import { ARXIV, ENGINE_URL, repoFile } from "@/lib/site";
+import { ARXIV, ENGINE_URL, PAPERS, repoFile } from "@/lib/site";
 
 export const metadata = {
   title: "Data",
   description:
-    "The policy engine's recorded run: every task's decisions in a classic agent and planned in advance, the trifecta check against an exhaustive search, least privilege, sandbox layers, and the published measurements the chapters quote.",
+    "The policy engine's recorded run: every task's decisions in a classic agent and planned in advance, the trifecta check against an exhaustive search, least privilege, sandbox layers, layered detectors, plan-then-execute, approval thresholds, every defence's cost and risk on the benign suite, the checklist, and the published measurements the chapters quote.",
 };
 
 const A =
@@ -43,6 +43,7 @@ function T({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
 }
 
 const aad = (s: Obj) => `${s.allow} / ${s.ask} / ${s.deny}`;
+const pc = (x: number, d = 1) => `${(x * 100).toFixed(d)}%`;
 
 export default function DataPage(): JSX.Element {
   const t = tree();
@@ -155,6 +156,127 @@ export default function DataPage(): JSX.Element {
             f.tally.broken,
             f.tally.stopped,
             f.tally.open,
+          ])}
+        />
+
+        <p>
+          Part two&apos;s numbers are recorded in{" "}
+          <a href={repoFile("src/data/policy2_results.md")} className={A}>
+            policy2_results.md
+          </a>
+          .
+        </p>
+
+        <h2>Chapter 6: attempts through the detector layers</h2>
+        <p>
+          {t.dp.n} attempts, drawn with the engine&apos;s seeded generator; base
+          rate {pc(t.dp.base, 0)}; expected values from the closed form in
+          brackets.
+        </p>
+        <T
+          head={[
+            "shared blind spot c",
+            "attempts",
+            "steer the model",
+            ...(K.DEPTH.layers as Obj[]).map((l) => `+ ${l.name}`),
+          ]}
+          rows={(t.depth.runs as Obj[]).map((r) => [
+            pc(r.c),
+            ...(r.frames as Obj[]).map(
+              (f) => `${f.count} (${(f.expected as number).toFixed(2)})`,
+            ),
+          ])}
+        />
+
+        <h2>Chapter 7: plan-then-execute</h2>
+        <T
+          head={[
+            "task",
+            "planned: allow / ask / deny",
+            "classic agent: allow / ask / deny",
+          ]}
+          rows={K.DUAL_PLANS.map((p) => {
+            const d = t.du[p] as Obj;
+            return [d.title, aad(d.planned), aad(d.classic)];
+          })}
+        />
+
+        <h2>Chapter 8: approval thresholds over the label policy</h2>
+        <T
+          head={[
+            "who must approve",
+            "tasks finished",
+            "prompts per task",
+            "risk per task",
+            "unchecked route",
+          ]}
+          rows={(K.UTILITY.thresholds as string[]).map((th) => {
+            const x = t.ap[th] as Obj;
+            return [
+              th,
+              pc(x.utility),
+              (x.prompts as number).toFixed(2),
+              pc(x.risk, 2),
+              pc(x.ungated),
+            ];
+          })}
+        />
+
+        {(["adaptive", "fixed"] as const).map((key) => (
+          <div key={key}>
+            <h2>
+              Chapter 9: the frontier,{" "}
+              {key === "adaptive"
+                ? "an attacker who adapts to the detectors"
+                : "fixed attacks (published rates)"}
+            </h2>
+            <p>
+              {t.fr.n} benign tasks; base rate {pc(t.fr[key].base, 0)}
+              {key === "adaptive" ? (
+                <>
+                  ; every detector layer passed (
+                  <a href={ARXIV(PAPERS.adaptive)} className={A}>
+                    arXiv {PAPERS.adaptive}
+                  </a>
+                  )
+                </>
+              ) : null}
+              .
+            </p>
+            <T
+              head={[
+                "defence",
+                "tasks finished",
+                "blocked",
+                "prompts / task",
+                "extra calls / task",
+                "risk / task",
+                "on the frontier",
+              ]}
+              rows={K.DEFENCES.map((d) => {
+                const p = t.fr[key][d.id] as Obj;
+                return [
+                  d.name,
+                  pc(p.utility),
+                  pc(p.blocked),
+                  (p.prompts as number).toFixed(2),
+                  (p.extra as number).toFixed(2),
+                  pc(p.risk, 2),
+                  p.front ? "yes" : "no",
+                ];
+              })}
+            />
+          </div>
+        ))}
+
+        <h2>Chapter 10: the default design&apos;s checklist</h2>
+        <T
+          head={["chapter", "check", "verdict", "measured"]}
+          rows={((t.checklist.default as Obj).items as Obj[]).map((i) => [
+            i.ch,
+            i.item,
+            i.verdict,
+            i.value,
           ])}
         />
 

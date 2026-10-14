@@ -8,13 +8,12 @@
 import Link from "next/link";
 
 import { SECTIONS } from "@/lib/mdx/sections";
-import { PLANNED } from "@/lib/planned";
 import { AGENTS_HUB } from "@/lib/site";
 
 export const metadata = {
   title: "Learn",
   description:
-    "Chapters on agent security, defences only: trust boundaries, untrusted input, the lethal trifecta, least privilege and scoped credentials, and sandboxing, each built around an animation driven by a tested policy engine.",
+    "Chapters on agent security, defences only: trust boundaries, untrusted input, the lethal trifecta, least privilege and scoped credentials, sandboxing, detection, structural designs, humans in the loop, the security–utility frontier and a builder's checklist, each built around an animation driven by a tested policy engine.",
 };
 
 export default function LearnIndex(): JSX.Element {
@@ -58,18 +57,6 @@ export default function LearnIndex(): JSX.Element {
             <p className="mt-1 pl-9 text-sm text-neutral-600 dark:text-neutral-400">
               {s.summary}
             </p>
-          </li>
-        ))}
-        {PLANNED.map((p, i) => (
-          <li key={p} className="py-4" data-planned>
-            <div className="flex items-baseline gap-3 text-neutral-500 dark:text-neutral-400">
-              <span className="font-mono text-xs">
-                {String(SECTIONS.length + i + 1).padStart(2, "0")}
-              </span>
-              <span>
-                {p} <span className="text-xs">(coming)</span>
-              </span>
-            </div>
           </li>
         ))}
       </ol>

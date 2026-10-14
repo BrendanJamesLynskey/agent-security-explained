@@ -70,7 +70,7 @@ describe("palette", () => {
 
 describe("chapters and site", () => {
   it("catalogue", async () => {
-    expect(SECTIONS).toHaveLength(5);
+    expect(SECTIONS).toHaveLength(10);
     expect(getSectionMeta("03-the-lethal-trifecta").title).toBe(
       "The lethal trifecta",
     );
@@ -79,10 +79,14 @@ describe("chapters and site", () => {
     expect(await readSectionMdx("01-trust-boundaries")).toMatch(
       /^<BoundaryWidget>/,
     );
+    expect(await readSectionMdx("10-a-builders-checklist")).toMatch(
+      /^<ChecklistWidget>/,
+    );
   });
   it("constants", () => {
     expect(SITE_URL).toBe("https://agent-security-explained.vercel.app");
     expect(repoFile("README.md")).toBe(`${GITHUB_URL}/blob/main/README.md`);
     expect(ARXIV(PAPERS.camel)).toBe("https://arxiv.org/abs/2503.18813");
+    expect(ARXIV(PAPERS.adaptive)).toBe("https://arxiv.org/abs/2503.00061");
   });
 });

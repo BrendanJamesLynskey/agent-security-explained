@@ -15,7 +15,7 @@ import {
 } from "@/lib/engine";
 import { fmtInt, pct, trim } from "@/lib/format";
 
-export type Fmt = "int" | "pct" | "pct1" | "num" | "f2" | "raw";
+export type Fmt = "int" | "pct" | "pct1" | "pct2" | "num" | "f2" | "raw";
 
 let TREE: Obj | null = null;
 
@@ -94,6 +94,90 @@ export function tree(): Obj {
   });
   t.sb.needed = K.ACTIONS.filter((a) => a.need).length;
   t.sb.unneeded = K.ACTIONS.filter((a) => !a.need).length;
+  // part two. Chapter 6: the depth table (keys "c<c>k<layers>"), the dots, the layers' miss rates
+  const dp = t.depth as Obj;
+  t.dp = {
+    base: K.DEPTH.base,
+    base_hi: K.DEPTH.base_range[1],
+    n: K.DEPTH_DOTS.n,
+    attempts: K.DEPTH.attempts,
+    trials: K.DEPTH.trials,
+    independent: dp.study.independent,
+    miss: Object.fromEntries(
+      (K.DEPTH.layers as Obj[]).map((l) => [l.id, l.miss]),
+    ),
+    t: {},
+    run: {},
+  };
+  for (const r of dp.study.table as Obj[]) t.dp.t[`c${r.c}k${r.layers}`] = r;
+  for (const r of dp.runs as Obj[])
+    t.dp.run[`c${r.c}`] = {
+      ...Object.fromEntries(
+        (r.frames as Obj[]).map((f) => [`f${f.f}`, f.count]),
+      ),
+      floor: r.n * K.DEPTH.base * r.c,
+    };
+  // chapter 7
+  t.du = {};
+  for (const [p, d] of Object.entries(t.dual.plans as Obj))
+    t.du[p] = {
+      title: d.title,
+      planned: d.summary.dataflow,
+      classic: d.summary.context,
+      extra: d.extra_calls,
+    };
+  // chapter 8
+  const ap = t.approval as Obj;
+  t.ap = { fatigue: {} };
+  for (const th of K.UTILITY.thresholds as string[])
+    t.ap[th] = ap.thresholds[th].summary;
+  for (const x of ap.fatigue as Obj[]) t.ap.fatigue[`n${x.n}`] = x.miss;
+  t.ap.first = K.UTILITY.approval_first_miss;
+  t.ap.decay = K.UTILITY.approval_decay;
+  t.ap.frames = K.UTILITY.frames;
+  // chapter 9
+  const fr = t.frontier as Obj;
+  t.fr = {
+    n: fr.n,
+    adaptive_share: fr.adaptive_share,
+    defences: K.DEFENCES.length,
+    sim: fr.sim,
+    fixed: {},
+    adaptive: {},
+    planner_calls: K.UTILITY.planner_calls,
+    fp: K.UTILITY.fp,
+    camel_ratio: t.pub.camel_secure / t.pub.camel_undefended,
+  };
+  for (const key of ["fixed", "adaptive"]) {
+    for (const p of fr[key].points as Obj[])
+      t.fr[key][p.id] = { ...p, front: fr[key].front.includes(p.id) };
+    t.fr[key].front_n = fr[key].front.length;
+    t.fr[key].base = fr[key].base;
+  }
+  // chapter 10
+  const ck = (t.checklist as Obj).default as Obj;
+  const withApproval = P.study.checklist({
+    defence: "planned",
+    approval: "consequential",
+    sandbox: ["fs_scope", "container", "egress"],
+  });
+  t.ck = {
+    approve: {
+      passed: withApproval.passed,
+      prompts: withApproval.summary.prompts,
+      verdict: Object.fromEntries(
+        (withApproval.items as Obj[]).map((i) => [`ch${i.ch}`, i.verdict]),
+      ),
+    },
+    risk: ck.summary.risk,
+    utility: ck.summary.utility,
+    prompts: ck.summary.prompts,
+    passed: ck.passed,
+    budget: K.UTILITY.risk_budget,
+    verdict: Object.fromEntries(
+      (ck.items as Obj[]).map((i) => [`ch${i.ch}`, i.verdict]),
+    ),
+  };
   TREE = t;
   return t;
 }
@@ -108,6 +192,8 @@ export function formatValue(v: unknown, fmt: Fmt): string {
       return pct(n);
     case "pct1":
       return pct(n, 1);
+    case "pct2":
+      return pct(n, 2);
     case "num":
       return trim(n);
     case "f2":

@@ -1,0 +1,60 @@
+<ApprovalWidget>
+  <Eq
+    label="The chance of a mistaken approval at a task's n-th prompt, and a task's risk: the best route a steered attempt has, gated or not"
+    tex="\begin{gathered} a(n) = 1 - (1 - \htmlClass{hl-fatigue}{a_1})\, \htmlClass{hl-fatigue}{r}^{\,n-1} \\ \text{risk} = p \cdot \max_{\text{routes}} \htmlClass{hl-gate}{\begin{cases} 0 & \text{denied} \\ a(n) & \text{a human is asked} \\ 1 & \text{open} \end{cases}} \end{gathered}"
+  />
+</ApprovalWidget>
+
+<Layer kind="concept">
+
+When the policy cannot decide, it asks: "private data would leave to a colleague: allow?" A person at the gate is a strong defence, because they see the whole situation, and a weak one, because they get tired. Claude Code's engineers describe the problem plainly: “Constantly clicking "approve" slows down development cycles and can lead to ‘approval fatigue’, where users might not pay close attention to what they're approving”, and report that in their internal usage sandboxing “safely reduces permission prompts by 84%” ([Anthropic engineering, 2025-10-20](https://www.anthropic.com/engineering/claude-code-sandboxing), opened 2026-10-14). Fewer, better prompts are the goal.
+
+The animation runs the label policy in a classic agent over the engine's suite of benign tasks (the first <V of="ap.frames" fmt="int" /> are shown, one per step; the totals cover all <V of="fr.n" fmt="int" />), and you choose who must approve:
+
+- **nobody**: the policy's asks are refused. No prompts at all, but only <V of="ap.refuse.utility" fmt="pct1" /> of the tasks finish.
+- **the policy's asks**: <V of="ap.policy.prompts" fmt="f2" /> prompts per task, and <V of="ap.policy.utility" fmt="pct1" /> finish. But the policy allows writes and sends that carry only public data, so a steered attempt still has an unchecked route in <V of="ap.policy.ungated" fmt="pct" /> of tasks: risk <V of="ap.policy.risk" fmt="pct1" /> per task.
+- **every write and send**: <V of="ap.consequential.prompts" fmt="f2" /> prompts per task, no unchecked route left, and the risk falls to <V of="ap.consequential.risk" fmt="pct1" />.
+- **every call**: <V of="ap.every.prompts" fmt="f2" /> prompts per task, and the risk goes **up** again, to <V of="ap.every.risk" fmt="pct1" />. Reads and summaries now ask too, so by the time a send comes up the person has already clicked several times, and each extra prompt makes a mistaken approval likelier.
+
+That last line is approval fatigue in the model: a mistaken approval is <V of="ap.fatigue.n1" fmt="pct" /> at a task's first prompt and <V of="ap.fatigue.n4" fmt="pct" /> at its fourth. The curve under the calls shows where each task sits on it. The lesson is the one the quote draws: put humans where only a human can judge (the writes and sends that carry data out), and make everything else safe without asking, with a sandbox ([chapter 5](/learn/05-sandboxing-and-egress)) or a plan ([chapter 7](/learn/07-designs-that-make-it-structural)).
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The approval miss rates (<V of="ap.first" fmt="pct" /> at the first prompt, each further prompt keeping <V of="ap.decay" fmt="pct" /> of the remaining attention) are illustrative: real approval behaviour depends on the person, the interface and the stakes, and no published figure is assumed. The suite of benign tasks is illustrative too; the decisions follow from the policy's rules. The 84% is the vendor's report of its own internal usage.
+
+</Callout>
+
+<Layer kind="maths">
+
+A task makes $n$ prompts. The engine models the person's attention at the $k$-th prompt as $(1 - a_1)\, r^{k-1}$, so the chance of approving a call they should refuse is $a(k) = 1 - (1 - a_1)\, r^{k-1}$, increasing in $k$. A steered attempt (at base rate $p$) needs a **route**: a write or send the task makes under untrusted control, or, in a classic agent, an unplanned send. A route the policy denies passes with probability 0, one a human must approve with $a(n)$, an open one with 1, and the attempt takes the best route:
+
+$$
+\text{risk} = p \cdot \max_{\text{routes}} \text{pass}.
+$$
+
+Gating more calls closes open routes (pass 1 → $a(n)$) but raises $n$, and with it $a(n)$ on every gated route. The engine's tests check that prompts per task rise with each threshold, that gating every write and send leaves no open route, and the closed forms against a seeded simulation.
+
+</Layer>
+
+<Layer kind="code">
+
+Approval fatigue, cut from the vendored engine (`policy/utility.ts`).
+
+```ts
+export function approvalMiss(n: number, cfg: Obj = UTILITY): number {
+  let keep = 1.0 - cfg.approval_first_miss;
+  for (let i = 0; i < n - 1; i++) keep = keep * cfg.approval_decay;
+  return 1.0 - keep;
+}
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Harnesses Explained: permissions](https://agent-harnesses-explained.vercel.app/learn/05-permissions), the permission modes, rules and simulated human of a coding agent's harness.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
+
+</Callout>

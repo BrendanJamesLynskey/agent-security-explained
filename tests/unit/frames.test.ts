@@ -100,4 +100,85 @@ describe("key frames", () => {
     expect(open[0]!.caption).toContain("not what it carries");
     for (const set of s.sets as Obj[]) expect(set.tally.broken).toBe(0);
   });
+
+  it("chapter 6: counts only fall, and with a shared blind spot the floor stays", () => {
+    const d = runChapter("depth");
+    for (const r of d.runs as Obj[]) {
+      const counts = (r.frames as Obj[]).map((f) => f.count as number);
+      expect(counts).toEqual([...counts].sort((a, b) => b - a));
+      expect(counts[0]).toBe(P.catalogue.DEPTH_DOTS.n);
+    }
+    const last = (d.runs as Obj[]).find((r) => r.c === 0.04)!.frames.at(-1);
+    expect(last.expected).toBeCloseTo(
+      P.catalogue.DEPTH_DOTS.n * P.catalogue.DEPTH.base * 0.04,
+      12,
+    );
+    expect(last.caption).toContain("no extra layer removes");
+  });
+
+  it("chapter 7: the planner sees names only, and planning is never stricter", () => {
+    const d = runChapter("dual").plans as Obj;
+    const R = P.engine.RANK;
+    for (const p of P.catalogue.DUAL_PLANS) {
+      const fr = d[p].frames as Obj[];
+      expect(fr[0]!.actor).toBe("planner");
+      expect(fr[0]!.planner_sees).toEqual(["q"]);
+      for (const f of fr.slice(1))
+        if (f.flow.decision !== "skip" && f.classic.decision !== "skip")
+          expect(R[f.flow.decision]!).toBeLessThanOrEqual(
+            R[f.classic.decision]!,
+          );
+    }
+    const tp = d.notes_then_page.frames as Obj[];
+    expect(tp.at(-1)!.flow.decision).toBe("ask");
+    expect(tp.at(-1)!.classic.decision).toBe("deny");
+    const ad = d.adaptive.frames as Obj[];
+    expect(ad.at(-1)!.flow.control).toEqual({
+      src: "untrusted",
+      sens: "public",
+    });
+    expect(ad.at(-1)!.caption).toContain("tracked rather than hidden");
+  });
+
+  it("chapter 8: more prompts per threshold, and every call is worse than every write and send", () => {
+    const a = runChapter("approval");
+    const s = (th: string) => a.thresholds[th].summary as Obj;
+    const ths = P.catalogue.UTILITY.thresholds as string[];
+    const prompts = ths.map((t) => s(t).prompts as number);
+    expect(prompts).toEqual([...prompts].sort((x, y) => x - y));
+    expect(s("consequential").ungated).toBe(0);
+    expect(s("every").risk).toBeGreaterThan(s("consequential").risk);
+    expect(s("refuse").utility).toBeLessThan(s("policy").utility);
+    for (const t of ths)
+      expect(a.thresholds[t].frames).toHaveLength(P.catalogue.UTILITY.frames);
+  });
+
+  it("chapter 9: planning in advance is on the adaptive frontier, the detectors are not", () => {
+    const f = runChapter("frontier");
+    expect(f.adaptive.front).toContain("planned");
+    expect(f.adaptive.front).not.toContain("detectors");
+    expect(f.fixed.front).toContain("detectors");
+    const pts = Object.fromEntries(
+      (f.adaptive.points as Obj[]).map((p) => [p.id, p]),
+    );
+    expect(pts.detectors.risk).toBe(pts.none.risk);
+    expect(pts.least.utility).toBe(pts.policy.utility);
+    expect(pts.least.risk).toBeLessThan(pts.policy.risk);
+    // every task the label policy blocks, it blocks by one rule
+    const pol = (f.fixed.points as Obj[]).find((p) => p.id === "policy")!;
+    expect(pol.by_rule["untrusted-egress-private"] / pol.n).toBe(pol.blocked);
+  });
+
+  it("chapter 10: the default design passes seven of nine; approvals trade check 2 for check 8", () => {
+    const c = runChapter("checklist").default as Obj;
+    expect(c.passed).toBe(7);
+    expect(c.items.map((i: Obj) => i.ch)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    const a = P.study.checklist({
+      defence: "planned",
+      approval: "consequential",
+      sandbox: ["fs_scope", "container", "egress"],
+    });
+    expect(a.items[1].verdict).toBe("pass");
+    expect(a.items[7].verdict).toBe("warn");
+  });
 });

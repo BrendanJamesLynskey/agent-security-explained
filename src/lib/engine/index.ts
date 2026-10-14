@@ -52,5 +52,21 @@ export function runChapter(chapter: Chapter): Obj {
     };
   }
   if (chapter === "privilege") return S.privilegeStudy();
-  return { frames: S.sandboxFrames(), sets: S.allLayerSets() };
+  if (chapter === "sandbox")
+    return { frames: S.sandboxFrames(), sets: S.allLayerSets() };
+  // part two (engine 1.11)
+  if (chapter === "depth")
+    return {
+      runs: (K.DEPTH.c as number[]).map((c) => S.depthFrames(c)),
+      study: S.depthStudy(),
+    };
+  if (chapter === "dual") {
+    const plans: Obj = {};
+    for (const p of K.DUAL_PLANS) plans[p] = S.dualFrames(p);
+    return { plans };
+  }
+  if (chapter === "approval") return S.approvalStudy();
+  if (chapter === "frontier") return S.frontierStudy();
+  // chapter 10: the default design; the widget audits other designs on demand
+  return { default: S.checklist() };
 }

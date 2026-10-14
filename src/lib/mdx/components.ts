@@ -7,8 +7,13 @@ import type { MDXRemoteProps } from "next-mdx-remote/rsc";
 
 import { Layer } from "@/components/interactive/Layer";
 import {
+  ApprovalWidget,
   BoundaryWidget,
+  ChecklistWidget,
   ContextWidget,
+  DepthWidget,
+  DualWidget,
+  FrontierWidget,
   PrivilegeWidget,
   SandboxWidget,
   TrifectaWidget,
@@ -30,4 +35,9 @@ export const mdxComponents: NonNullable<MDXRemoteProps["components"]> = {
   TrifectaWidget,
   PrivilegeWidget,
   SandboxWidget,
+  DepthWidget,
+  DualWidget,
+  ApprovalWidget,
+  FrontierWidget,
+  ChecklistWidget,
 };

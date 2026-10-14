@@ -1,0 +1,56 @@
+<DepthWidget>
+  <Eq
+    label="An attempt gets through if it steers the model and every layer misses it; with a shared blind spot c, the layers' misses are a mixture"
+    tex="\begin{gathered} P(\text{through}) = \htmlClass{hl-base}{p} \cdot \Big( \htmlClass{hl-c}{c} + (1 - c) \htmlClass{hl-prod}{\prod_{i} q_i} \Big) \\ q_i = \frac{m_i - c}{1 - c} \end{gathered}"
+  />
+</DepthWidget>
+
+<Layer kind="concept">
+
+Chapters 1 to 5 put defences where the labels say data crosses a boundary. The other family of defences tries to **recognise** a steering attempt: mark untrusted text so the model can tell it apart (Spotlighting's provenance marking, [Hines et al. 2024](https://arxiv.org/abs/2403.14720)), run a classifier over each tool result, check the model's output before it acts. Each is a filter, and each misses some attempts. Stacking them helps, because an attempt must get past every layer, so the misses multiply.
+
+The animation draws <V of="dp.n" fmt="int" /> attempts arriving in untrusted results. At the published base rate (<V of="dp.base" fmt="pct" />, InjecAgent's ReAct GPT-4 figure, [Zhan et al. 2024](https://arxiv.org/abs/2403.02691)) about a quarter of them would steer an undefended model. Then three layers are added: provenance marking, which misses <V of="dp.miss.marking" fmt="pct" /> (the ratio of Spotlighting's published bounds, below 2% from above 50%), an input classifier that misses <V of="dp.miss.classifier" fmt="pct" /> and an output check that misses <V of="dp.miss.output_check" fmt="pct" />. If the layers miss independently, all three miss <V of="dp.independent" fmt="pct2" /> of attempts, and end to end <V of="dp.t.c0k3.end_to_end" fmt="pct2" /> get through. That is a large reduction, and it is **not zero**: over <V of="dp.attempts" fmt="int" /> attempts, the chance that at least one gets through is <V of="dp.t.c0k3.any_of_n" fmt="pct" />.
+
+Real layers do not miss independently. Detectors trained on similar data, or reading the same rewritten text, share blind spots: some attempts evade them all at once. Choose a shared blind spot in the animation. With just <V of="dp.t.c0.01k3.c" fmt="pct" /> of attempts evading every layer together, all three miss <V of="dp.t.c0.01k3.all_miss" fmt="pct2" />, about five times the independent figure, and the chance that one of <V of="dp.attempts" fmt="int" /> gets through rises to <V of="dp.t.c0.01k3.any_of_n" fmt="pct" />. A blind spot every layer shares is a floor that no extra layer can lower.
+
+The published rates are also measured against fixed sets of attacks. An attacker who can probe the defences adapts to them: [Zhan et al. (2025)](https://arxiv.org/abs/2503.00061) evaluated eight defences against indirect prompt injection and bypassed every one with adaptive attacks, at an attack success rate over 50%. So detection is worth having as a layer, and is never the whole answer. The rest of this part is about defences that do not depend on recognising anything: designs that make the dangerous flow impossible ([chapter 7](/learn/07-designs-that-make-it-structural)), humans at the gate ([chapter 8](/learn/08-humans-in-the-loop)), and what each costs ([chapter 9](/learn/09-the-frontier)).
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The classifier's and the output check's miss rates and the shared blind spots are illustrative; provenance marking's rate and the base rate come from the cited papers, measured on their models and attacks, and are not the rates of any other system. The attempts are abstract draws from the engine's seeded generator: nothing here holds attack text.
+
+</Callout>
+
+<Layer kind="maths">
+
+Layer $i$ misses an attempt with probability $m_i$. Independently, all $n$ layers miss with probability $\prod_i m_i$, which is positive whenever every $m_i$ is. The engine models correlation as a **common-mode mixture**: with probability $c$ an attempt evades every layer together; otherwise layer $i$ misses independently with $q_i = (m_i - c)/(1 - c)$, chosen so each layer's own miss rate stays $m_i$. Then
+
+$$
+P(\text{all miss}) = c + (1 - c) \prod_i q_i \;\ge\; c,
+$$
+
+and the correlation between two layers' misses is $\big(P(\text{both}) - m_i m_j\big) / \sqrt{m_i(1 - m_i)\, m_j(1 - m_j)}$ with $P(\text{both}) = c + (1-c)\, q_i q_j$. Over $N$ attempts, each getting through with probability $p\,P(\text{all miss})$, at least one gets through with probability $1 - \big(1 - p\,P(\text{all miss})\big)^N$, which tends to 1 as $N$ grows for any positive rate. The engine's tests check the closed forms against a seeded simulation of <V of="dp.trials" fmt="int" /> attempts per blind spot, and the animation's draws against the same closed form.
+
+</Layer>
+
+<Layer kind="code">
+
+The mixture, cut from the vendored engine (`policy/depth.ts`): the shared blind spot plus the independent part.
+
+```ts
+export function allMissCommon(m: number[], c: number): number {
+  return c + (1.0 - c) * allMissIndependent(qGivenCommon(m, c));
+}
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- MCP series: [MCP 04: security and OAuth](https://brendanjameslynskey.github.io/MCP_04_Security_and_OAuth/), with the defences proposed for tool output.
+- [Agent Evals Explained: graders](https://agent-evals-explained.vercel.app/learn/06-graders), on measuring a classifier's errors and correcting for them.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
+
+</Callout>

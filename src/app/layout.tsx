@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s · Agent Security Explained",
   },
   description:
-    "How to build agents that stay safe: trust boundaries, labels on every value, untrusted input, the lethal trifecta, least privilege and scoped credentials, and sandboxing, each animated by a tested policy engine. Defences only.",
+    "How to build agents that stay safe: trust boundaries, labels on every value, untrusted input, the lethal trifecta, least privilege and scoped credentials, sandboxing, detection, structural designs, humans in the loop and the security–utility frontier, each animated by a tested policy engine. Defences only.",
 };
 
 export default function RootLayout({

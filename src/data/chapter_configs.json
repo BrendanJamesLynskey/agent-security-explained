@@ -3,5 +3,10 @@
   "context": { "default": "notes_then_page" },
   "trifecta": {},
   "privilege": {},
-  "sandbox": { "default": ["fs_scope", "container", "egress"] }
+  "sandbox": { "default": ["fs_scope", "container", "egress"] },
+  "depth": { "default": 0.01 },
+  "dual": { "default": "notes_then_page" },
+  "approval": { "default": "policy" },
+  "frontier": { "default": "adaptive" },
+  "checklist": {}
 }

@@ -14,7 +14,7 @@
  * proves it rendered from the engine: the landing page and the data page must print the engine's
  * own numbers (computed here with the same code), every chapter its MDX (a layer, server-rendered
  * KaTeX, the animation's placeholder), and the header the four-track site menu with this site
- * listed as Security.
+ * live in it as Security and marked current.
  */
 import { formatValue, lookup } from "@/lib/security/values";
 import VENDORED from "@/lib/engine/vendor/VENDORED.json";
@@ -37,6 +37,7 @@ const SWITCH = [
   'data-site-group="hardware"',
   'href="https://ai-racks-explained.vercel.app"',
   'href="https://agent-evals-explained.vercel.app"',
+  'href="https://agent-security-explained.vercel.app" title="Agent Security Explained: threats and defences" data-site-key="security" aria-current="true"',
   'data-site-place="security"',
   'data-site-key="inference"',
   'href="https://gpu-kernels-explained.vercel.app"',
@@ -71,16 +72,21 @@ async function main(): Promise<void> {
     checkPage(base, "/", [
       "Agent Security Explained",
       formatValue(lookup("tri.agree"), "int"),
-      "Coming next:",
+      formatValue(lookup("fr.adaptive.planned.risk"), "pct1"),
       ...SWITCH,
     ]),
     checkPage(base, "/data", [
       "The recorded run",
       "Chapter 4: least privilege",
+      "Chapter 10: the default design",
       formatValue(lookup("pub.injecagent_cases"), "int"),
     ]),
     checkPage(base, "/about", ["The engine", VENDORED.commit.slice(0, 7)]),
-    checkPage(base, "/learn", [...SECTIONS.map((x) => x.slug), "(coming)"]),
+    checkPage(
+      base,
+      "/learn",
+      SECTIONS.map((x) => x.slug),
+    ),
     ...SECTIONS.map((x) =>
       checkPage(base, `/learn/${x.slug}`, [
         'data-layer="concept"',
