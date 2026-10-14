@@ -1,0 +1,52 @@
+<BoundaryWidget>
+  <Eq
+    label="The label of a value is the join of the labels of its arguments and of whatever controls the call that made it"
+    tex="\begin{gathered} \ell(v) = \htmlClass{hl-args}{\ell(a_1) \sqcup \cdots \sqcup \ell(a_n)} \sqcup \htmlClass{hl-ctl}{\ell(\text{control})} \\ \htmlClass{hl-out}{\ell(\text{read}) = \ell_{\text{source}} \sqcup \ell(\text{call})} \end{gathered}"
+  />
+</BoundaryWidget>
+
+<Layer kind="concept">
+
+An agent is a model in a loop with tools. Draw it as four places: the **user**, who asks; the **model**, which decides; the **tools**, which read and change things; and the **outside world**, where messages, web requests and uploads go. Every step moves a value from one place to another, and every move crosses a **boundary**. The boundaries are where an agent can go wrong, and so they are where defences go.
+
+This site never looks at what a value says. It looks only at its **label**: where the value came from (the **source**: the user, a trusted tool such as the user's own notes, or something **untrusted** that a third party could have written, such as a web page or a message from someone else) and how secret it is (**public** or **private**). That gives <V of="consts.labels" fmt="int" /> labels. A value made from other values carries the **join** of their labels: the more tainted source and the more secret sensitivity. Labels only ever go up as data flows.
+
+The animation runs a small task through the engine's <V of="consts.tools" fmt="int" /> abstract tools: read my notes and my inbox, then reply to a colleague. The request is the user's and public. The notes come back trusted and private; the inbox comes back untrusted and private (anyone can send the user a message). The summary joins them, so it is untrusted and private. When the reply tries to leave, the **policy** at the gate between the model and the world sees an untrusted, private value heading to a destination that may not read it, and the decision is <V of="plan.reply_from_notes.classic_last" fmt="raw" />. Pick another task: a summary of the user's own notes written to a file goes through untouched, and so does a digest the user sends to themselves.
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The <V of="consts.tools" fmt="int" /> tools, <V of="consts.dests" fmt="int" /> destinations and <V of="consts.plans" fmt="int" /> tasks are abstract placeholders, not products, and nothing here holds content: the engine propagates labels and applies rules. The rules are one reasonable policy, not a standard; chapter 7 (part two of this site) compares designs that enforce them.
+
+</Callout>
+
+<Layer kind="maths">
+
+Order the sources $\text{user} \sqsubseteq \text{trusted} \sqsubseteq \text{untrusted}$ and the sensitivities $\text{public} \sqsubseteq \text{private}$. A label is a pair, and labels are ordered part by part (the **product order**), which makes them a **lattice**: any two labels have a least upper bound, the join $\sqcup$, and a greatest lower bound, the meet $\sqcap$. The join is what a derived value gets, so a value is at least as tainted and at least as secret as everything it was made from. The engine's tests check every lattice law (order, bounds, commutativity, associativity, absorption) on all <V of="consts.labels" fmt="int" /> labels.
+
+A **call** is also controlled by something: the model chose to make it, and chose its arguments, after reading what was in its context. So a call's **effective label** is the join of its arguments' labels and its **control** label. A read returns the join of its source's label and the call's effective label (what was read depends on how the call was chosen). Chapter 2 is about the control label.
+
+This is classic **information-flow control** ([Denning 1976](https://doi.org/10.1145/360051.360056), a lattice model of secure information flow), applied to the values an agent moves around. CaMeL ([Debenedetti et al. 2025](https://arxiv.org/abs/2503.18813)) applies the same idea to agents, with capabilities attached to values.
+
+</Layer>
+
+<Layer kind="code">
+
+The join, cut from the vendored engine (`policy/labels.ts`):
+
+```ts
+export function join(a: Label, b: Label): Label {
+  return { src: si(a.src) >= si(b.src) ? a.src : b.src, sens: ci(a.sens) >= ci(b.sens) ? a.sens : b.sens };
+}
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Harnesses Explained: permissions](https://agent-harnesses-explained.vercel.app/learn/05-permissions), the gate as a harness implements it, rule by rule.
+- [Agent Protocols Explained: protocol security](https://agent-protocols-explained.vercel.app/learn/09-protocol-security), three protocol-level attacks and the check that stops each.
+- The [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/) decks, and [LLM Hub: MCP](https://brendanjameslynskey.github.io/LLM_Hub_MCP/) for the protocol between the model and its tools.
+
+</Callout>

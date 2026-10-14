@@ -1,0 +1,51 @@
+<TrifectaWidget>
+  <Eq
+    label="A flow of private data out under untrusted control exists if and only if the agent holds private data, untrusted input and an outbound channel"
+    tex="\htmlClass{hl-all}{\exists\,\text{flow out}} \iff \htmlClass{hl-private}{P \neq \varnothing} \;\land\; \htmlClass{hl-untrusted}{U \neq \varnothing} \;\land\; \htmlClass{hl-outbound}{O \neq \varnothing}"
+  />
+</TrifectaWidget>
+
+<Layer kind="concept">
+
+Chapter 1's denied reply needed three things at once. Something **private** had to be in reach (the notes, the inbox). Something **untrusted** had to be read (the inbox, a web page), because that is what can steer the model. And there had to be a way to **send data out** (a message, a web request). [Simon Willison](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) named this combination the **lethal trifecta**: an agent that holds all three can be steered into leaking, and one that lacks any of them cannot leak this way, whatever text it reads.
+
+The engine checks the claim instead of assuming it. For a set of tools, it puts each tool into the circles it belongs to (a read of private data, a read of untrusted data, a tool that can carry data to a destination not allowed to read private data). Separately, with no policy at all, it searches **every** sequence of up to three calls the agent could make for one that carries private data out under untrusted control. Over all <V of="tri.n" fmt="int" /> subsets of the engine's tools, <V of="tri.trifecta" fmt="int" /> hold all three circles, and the trifecta check and the exhaustive search agree on <V of="tri.agree" fmt="int" /> of <V of="tri.n" fmt="int" />.
+
+The animation steps through the eight combinations of three simple tools, one per circle. Only the last has a flow out, and on it the policy's decision is <V of="tri.all_decision" fmt="raw" /> (rule: <V of="tri.all_rule" fmt="raw" />). Then two agents with just one tool each in two circles: reading an inbox is both private and untrusted, so an inbox reader that can send messages is already a trifecta; and fetching web pages is both untrusted input and a way out, because the address requested leaves the system, so a page fetcher that can read the user's notes is one too. Use the buttons to add and remove circles yourself.
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The circles are assigned from the abstract tools' declared labels; a real tool's place depends on what it can actually touch (an "internal" search over shared documents is untrusted input if anyone can write those documents). The search is exhaustive only over the engine's small tool set and sequences of up to three calls.
+
+</Callout>
+
+<Layer kind="maths">
+
+Let $P$, $U$ and $O$ be the sets of held tools in each circle. A flow out needs a context that is both untrusted and private when an outbound call is made. In a classic agent the context is the join of everything read (chapter 2), so it reaches $(\text{untrusted}, \text{private})$ exactly when some read in $P$ and some read in $U$ have run (one tool may be in both), and an outbound tool in $O$ can then be called. Hence a flow out exists if and only if all three sets are non-empty, and two reads plus one send (three calls) always suffice, which is why the search stops at three.
+
+Removing a circle is therefore a **structural** defence: it does not depend on detecting anything. Its cost is that the task may need the tool you removed. Least privilege (chapter 4) asks which circles a task needs; splitting a task so no single context holds all three is the idea behind several of the design patterns in chapter 7 (part two).
+
+</Layer>
+
+<Layer kind="code">
+
+The check, cut from the vendored engine (`policy/capabilities.ts`):
+
+```ts
+export function trifecta(grant: Obj): Obj {
+  const c = circles(grant);
+  return { ...c, all: c.private!.length > 0 && c.untrusted!.length > 0 && c.outbound!.length > 0 };
+}
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- Simon Willison, [The lethal trifecta for AI agents](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) (2025): the term, and why guardrails that catch most attempts are not enough.
+- [Agent Protocols Explained: gateways and composition](https://agent-protocols-explained.vercel.app/learn/07-gateways-and-composition): how one client ends up holding many servers' tools at once.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
+
+</Callout>

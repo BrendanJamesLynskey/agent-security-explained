@@ -1,0 +1,67 @@
+{
+  "repository": "https://github.com/BrendanJamesLynskey/Agent_Loop_Sim",
+  "commit": "ec358ed70b472051c0c3e8b4d07d2e89ae146a80",
+  "committed": "2026-10-14T01:07:20+01:00",
+  "files": {
+    "src/lib/engine/vendor/context/text.ts": {
+      "from": "ts/src/context/text.ts",
+      "sha256": "ead45ab60535f0d17738c52cfb3bb5a1ce15839228a0a615d99813043d1cf8e7"
+    },
+    "src/lib/engine/vendor/data.ts": {
+      "from": "ts/src/data.ts",
+      "sha256": "65f43d25809dc3c7538b79021af154245b2c2e00a88ecda3b775423436cb75b4"
+    },
+    "src/lib/engine/vendor/engine_data.json": {
+      "from": "ts/src/engine_data.json",
+      "sha256": "0f43325c271ac590b098990377fca6004c45dc259d77c1f50fd2b332297acbb9"
+    },
+    "src/lib/engine/vendor/policy/capabilities.ts": {
+      "from": "ts/src/policy/capabilities.ts",
+      "sha256": "686f7c6dbdece6e8b52be841b0ebb572ce7851c7f29853a16a79dc97995584cb"
+    },
+    "src/lib/engine/vendor/policy/catalogue.ts": {
+      "from": "ts/src/policy/catalogue.ts",
+      "sha256": "adab8ed667e681003bb2a18da6667ece50145cd3bf4dc549611e8acb80ba5f6a"
+    },
+    "src/lib/engine/vendor/policy/depth.ts": {
+      "from": "ts/src/policy/depth.ts",
+      "sha256": "0fe861b4f0674747a762c2936b55f115f604058743d736d91bf66d4767f6c0b8"
+    },
+    "src/lib/engine/vendor/policy/engine.ts": {
+      "from": "ts/src/policy/engine.ts",
+      "sha256": "3b9fea2ff93b271efb6e17f2cb675ada53cac9620ba332b6b0b3d04f11394d30"
+    },
+    "src/lib/engine/vendor/policy/index.ts": {
+      "from": "ts/src/policy/index.ts",
+      "sha256": "b18ed580c9a7b60182e9d261699a056381034aeb75a37a10672e5b240fb6b219"
+    },
+    "src/lib/engine/vendor/policy/labels.ts": {
+      "from": "ts/src/policy/labels.ts",
+      "sha256": "7d7571ff69b3365b642a9582eb29ef4be048e25ad8b1644927c1b5277440f2a1"
+    },
+    "src/lib/engine/vendor/policy/sandbox.ts": {
+      "from": "ts/src/policy/sandbox.ts",
+      "sha256": "58a9a0232f581eb403c6fafa08fc2f4b69c7509d7b0ab799ec74be89a05dde43"
+    },
+    "src/lib/engine/vendor/policy/study.ts": {
+      "from": "ts/src/policy/study.ts",
+      "sha256": "e1d5395237144115bff759ac182e11099fb1f931160fe950aa85ef5213da3a7f"
+    },
+    "src/lib/engine/vendor/policy_data.json": {
+      "from": "ts/src/policy_data.json",
+      "sha256": "b5824a9b06981d329097de1c4b3b36b4340008897f35b3db1a78308d13bfd5f0"
+    },
+    "src/lib/engine/vendor/rng.ts": {
+      "from": "ts/src/rng.ts",
+      "sha256": "7a31f5f304c80f66d5b58b95213a8e32ed0d3a8da6062b0d9702ad3a9977d296"
+    },
+    "tests/fixtures/policy_fixtures.json": {
+      "from": "fixtures/policy_fixtures.json",
+      "sha256": "55f308182296be9326cff35c799c30ab2252b7473a98ec5af59c75d91408caba"
+    },
+    "src/data/policy_results.md": {
+      "from": "fixtures/policy_results.md",
+      "sha256": "b3376f89b2866c09fbe48ff719f066d9af383e065551ea1e2bf8e1316232a647"
+    }
+  }
+}

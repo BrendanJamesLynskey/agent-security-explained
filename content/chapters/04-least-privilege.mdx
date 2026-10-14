@@ -1,0 +1,49 @@
+<PrivilegeWidget>
+  <Eq
+    label="A call is allowed only if its tool, its scope and its destination are in the task's grant, and the task's grant is exactly what its plan uses; a token is accepted only by its own audience and only for scopes it holds"
+    tex="\begin{gathered} \text{allow}(t, d) \Rightarrow \htmlClass{hl-grant}{t \in T_g \land s(t) \in S_g \land d \in D_g} \\ \htmlClass{hl-need}{g_{\text{task}} = \textstyle\bigcup_{\text{steps}} \{t, s(t), d\}} \\ \text{accept}(\tau, t) \iff \htmlClass{hl-aud}{\text{aud}(\tau) = \text{server}(t)} \\ \land\; s(t) \in \text{scopes}(\tau) \end{gathered}"
+  />
+</PrivilegeWidget>
+
+<Layer kind="concept">
+
+**Least privilege** is the oldest rule in security: give each piece of a system only the access it needs. For an agent the unit is the **task**. Before it runs, work out from its plan which tools it calls, which permission scopes those calls need, and which destinations it sends to, and grant exactly that. Anything outside the grant is denied by a rule that needs no detection and no judgement.
+
+The animation runs one task, summarising the user's notes into a file, under two grants. The **broad** grant holds all <V of="priv.broad_tools" fmt="int" /> tools, every scope and every destination; the task needs <V of="priv.task_tools" fmt="int" /> (<V of="priv.task_list" fmt="raw" />), so <V of="priv.unneeded" fmt="int" /> tools sit in the broad grant unused, including every tool that reads untrusted data and both ways to send data out (chapter 3's circles). The last call, sending the notes to an outside address, is not part of the task. Under the broad grant the only thing in its way is a rule about private data, which leaves it to the user to approve (<V of="priv.extra_broad" fmt="raw" />; here the user refuses). Under least privilege it is <V of="priv.extra_task" fmt="raw" />, for <V of="priv.extra_task_rules" fmt="int" /> separate reasons: the tool is not granted, its scope is not granted, the destination is not granted, and private data would leave.
+
+The same idea applies to credentials. Each server an agent calls gets its own **token**, minted for that server (its **audience**) with only the scopes the task needs there: the broad grant mints <V of="priv.broad_tokens" fmt="int" /> tokens, least privilege <V of="priv.task_tokens" fmt="int" />. A token presented anywhere else is refused: <V of="priv.passthrough" fmt="raw" />. The MCP authorisation spec makes this a requirement: servers "MUST validate that access tokens were issued specifically for them as the intended audience" ([MCP 2026-07-28, authorisation](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization), using [RFC 8707](https://www.rfc-editor.org/rfc/rfc8707) resource indicators), and its [security best practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices) call passing a client's token through to another service an anti-pattern (opened 2026-10-14).
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The tools, scopes (`notes:read`, `files:write`, …) and servers are placeholders. Real grants are coarser than this: many APIs offer few scopes, and a task's needs are not always known before it runs, which is where approval (chapter 8, part two) comes in.
+
+</Callout>
+
+<Layer kind="maths">
+
+A grant $g = (T_g, S_g, D_g)$ is a set of tools, scopes and destinations. The least privilege for a plan is the union over its steps of the tool, its scope and its destination; the plan runs under it with exactly the denials it meets under the broad grant (the engine's tests check this on every plan), and anything beyond it only adds calls the plan never makes. The rules are monotone: a smaller grant never allows a call a larger one denies, and a higher label never relaxes a decision (both tested on every tool, label and destination).
+
+Least privilege bounds what a steered agent **can** do, not what it will try. With the broad grant, the agent holds all three circles of chapter 3; with the task's grant it holds only private data and a local write, so no flow out exists at all, whatever it reads.
+
+</Layer>
+
+<Layer kind="code">
+
+The token check, cut from the vendored engine (`policy/capabilities.ts`):
+
+```ts
+if (token.aud !== spec.aud) return { ok: false, reason: `the token is for ${token.aud}, not ${spec.aud}: rejected` };
+if (!token.scopes.includes(spec.scope)) return { ok: false, reason: `the token lacks ${spec.scope}` };
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Protocols Explained: authorisation](https://agent-protocols-explained.vercel.app/learn/06-authorisation), the OAuth 2.1 flow MCP requires, step by step; and [protocol security](https://agent-protocols-explained.vercel.app/learn/09-protocol-security) for the confused deputy.
+- [OAuth for MCP](https://brendanjameslynskey.github.io/OAuth_for_MCP/): resource indicators, sender-constrained tokens and the anti-patterns.
+- [LLM Hub: MCP](https://brendanjameslynskey.github.io/LLM_Hub_MCP/).
+
+</Callout>
