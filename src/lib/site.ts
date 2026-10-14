@@ -18,6 +18,12 @@ export const EVALS_URL = "https://agent-evals-explained.vercel.app";
 
 export const GITHUB_URL =
   "https://github.com/BrendanJamesLynskey/agent-security-explained";
+
+/** The author, credited in one quiet line at the foot of the About page. */
+export const AUTHOR = {
+  name: "Brendan Lynskey",
+  url: "https://github.com/BrendanJamesLynskey",
+} as const;
 export const ENGINE_URL =
   "https://github.com/BrendanJamesLynskey/Agent_Loop_Sim";
 
