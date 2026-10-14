@@ -7,7 +7,8 @@ For every chapter (src/data/chapter_configs.json), everything it animates and qu
 reference's policy module: each task's boundary frames in both kinds of agent (chapter 1), the classic
 agent against the plan made in advance (2), the trifecta cases and the agreement of the trifecta check
 with the exhaustive search over every subset of the tools (3), least privilege (4) and every set of
-sandbox layers (5). tests/unit/frames.test.ts recomputes them with the vendored TS port (src/lib/engine's
+sandbox layers (5); attempts through the detector layers (6), plan-then-execute (7), approval thresholds
+(8), the frontier (9) and the default design's checklist (10). tests/unit/frames.test.ts recomputes them with the vendored TS port (src/lib/engine's
 runChapter) and requires equality; tests/e2e/frames.spec.ts checks the captions on the page.
 
 The engine must be installed from git at the commit in src/lib/engine/vendor/VENDORED.json
@@ -51,7 +52,17 @@ def run_chapter(chapter: str) -> dict:
                             "agree": sum(1 for a, b in subsets if a == b)}}
     if chapter == "privilege":
         return S.privilege_study()
-    return {"frames": S.sandbox_frames(), "sets": S.all_layer_sets()}
+    if chapter == "sandbox":
+        return {"frames": S.sandbox_frames(), "sets": S.all_layer_sets()}
+    if chapter == "depth":
+        return {"runs": [S.depth_frames(c) for c in K.DEPTH["c"]], "study": S.depth_study()}
+    if chapter == "dual":
+        return {"plans": {p: S.dual_frames(p) for p in K.DUAL_PLANS}}
+    if chapter == "approval":
+        return S.approval_study()
+    if chapter == "frontier":
+        return S.frontier_study()
+    return {"default": S.checklist()}
 
 
 def build() -> dict[Path, str]:

@@ -5,6 +5,7 @@
  */
 import { expect, test, type Locator } from "@playwright/test";
 
+import fx2 from "../fixtures/policy2_fixtures.json";
 import fx from "../fixtures/site_fixtures.json";
 
 import type { Obj } from "@/lib/engine";
@@ -68,6 +69,19 @@ const P2 = "/learn/02-untrusted-input";
 const P3 = "/learn/03-the-lethal-trifecta";
 const P4 = "/learn/04-least-privilege";
 const P5 = "/learn/05-sandboxing-and-egress";
+const P6 = "/learn/06-detection-is-not-enough";
+const P7 = "/learn/07-designs-that-make-it-structural";
+const P8 = "/learn/08-humans-in-the-loop";
+const P9 = "/learn/09-the-frontier";
+const P10 = "/learn/10-a-builders-checklist";
+const DEPTH = (c: number) =>
+  (CH.depth.runs as Obj[]).find((r) => r.c === c)!.frames as Obj[];
+const DUAL = CH.dual.plans as Obj;
+const APPROVAL = CH.approval.thresholds as Obj;
+const CHECKS = ((fx2 as Obj).study.checklist as Obj[]).filter(
+  (c) => c.design.sandbox.length === 3 && !c.design.approval,
+);
+const checkOf = (d: string) => CHECKS.find((c) => c.design.defence === d)!;
 const B = CH.boundary.plans as Obj;
 const CX = CH.context.plans as Obj;
 const SETS = CH.sandbox.sets as Obj[];
@@ -133,6 +147,71 @@ const CASES: Case[] = [
     captions: caps(setOf(["fs_scope", "container"]).frames),
     choose: press(/^Network allow-list/),
   },
+  {
+    path: P6,
+    id: "depth-widget",
+    name: "a 1% blind spot (default)",
+    captions: caps(DEPTH(0.01)),
+  },
+  {
+    path: P6,
+    id: "depth-widget",
+    name: "a 4% blind spot",
+    captions: caps(DEPTH(0.04)),
+    choose: select("Shared blind spot c", "0.04"),
+  },
+  {
+    path: P7,
+    id: "dual-widget",
+    name: "notes then page (default)",
+    captions: caps(DUAL.notes_then_page.frames),
+  },
+  {
+    path: P7,
+    id: "dual-widget",
+    name: "a task that branches on what it read",
+    captions: caps(DUAL.adaptive.frames),
+    choose: select("Task", "adaptive"),
+  },
+  {
+    path: P8,
+    id: "approval-widget",
+    name: "the policy's asks (default)",
+    captions: caps(APPROVAL.policy.frames),
+  },
+  {
+    path: P8,
+    id: "approval-widget",
+    name: "every call",
+    captions: caps(APPROVAL.every.frames),
+    choose: select("Who must approve", "every"),
+  },
+  {
+    path: P9,
+    id: "frontier-widget",
+    name: "an adaptive attacker (default)",
+    captions: caps(CH.frontier.adaptive.frames),
+  },
+  {
+    path: P9,
+    id: "frontier-widget",
+    name: "fixed attacks",
+    captions: caps(CH.frontier.fixed.frames),
+    choose: radio("fixed (published rates)"),
+  },
+  {
+    path: P10,
+    id: "checklist-widget",
+    name: "the default design",
+    captions: caps(CH.checklist.default.frames),
+  },
+  {
+    path: P10,
+    id: "checklist-widget",
+    name: "detectors alone",
+    captions: caps(checkOf("detectors").frames),
+    choose: select("Design", "detectors"),
+  },
 ];
 
 for (const c of CASES) {
@@ -164,4 +243,29 @@ test("chapter 4: the last call's token check is the reference's", async ({
   await expect(
     fig.getByTestId("grant-task").locator("[data-decision]"),
   ).toHaveAttribute("data-decision", extra.task.decision);
+});
+
+test("chapter 10: approving every write and send passes check 2 and warns on check 8", async ({
+  page,
+}) => {
+  await page.goto(P10);
+  const fig = page.getByTestId("checklist-widget");
+  await expect(fig).toBeVisible({ timeout: ENGINE_TIMEOUT });
+  await press(/^Approve every write and send/)(fig);
+  const want = ((fx2 as Obj).study.checklist as Obj[]).find(
+    (c) =>
+      c.design.defence === "planned" &&
+      c.design.approval === "consequential" &&
+      c.design.sandbox.length === 3,
+  )!;
+  const last = want.frames.length - 1;
+  await frame(fig, last, want.frames[last].caption);
+  await expect(fig.locator("[data-check='2']")).toHaveAttribute(
+    "data-verdict",
+    "pass",
+  );
+  await expect(fig.locator("[data-check='8']")).toHaveAttribute(
+    "data-verdict",
+    "warn",
+  );
 });

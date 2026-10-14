@@ -23,7 +23,7 @@ The actions, zones and layers are abstract: real sandboxes (containers and virtu
 
 <Layer kind="maths">
 
-Each layer $L$ is a predicate $\text{stops}_L(a)$ on actions, and an action gets through a stack of layers only if no active layer stops it. So the set of actions that get through can only shrink as layers are added (the engine's tests check this on all $2^{3}$ subsets of the layers), and layers that stop the same action overlap: with the file scope on, the container adds only the process escape. A sandbox is worth judging by two counts: the unneeded actions still open, and the needed actions it breaks. Here the second is zero for every subset of layers, because each layer was configured from the task; a stricter allow-list without the registry would stop the package install and break the task. Part two weighs that cost against the published effect of each defence.
+Each layer $L$ is a predicate $\text{stops}_L(a)$ on actions, and an action gets through a stack of layers only if no active layer stops it. So the set of actions that get through can only shrink as layers are added (the engine's tests check this on all $2^{3}$ subsets of the layers), and layers that stop the same action overlap: with the file scope on, the container adds only the process escape. A sandbox is worth judging by two counts: the unneeded actions still open, and the needed actions it breaks. Here the second is zero for every subset of layers, because each layer was configured from the task; a stricter allow-list without the registry would stop the package install and break the task. [Chapter 9](/learn/09-the-frontier) weighs such costs against the published effect of each defence.
 
 </Layer>
 

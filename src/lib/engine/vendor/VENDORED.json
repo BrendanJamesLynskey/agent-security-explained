@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/BrendanJamesLynskey/Agent_Loop_Sim",
-  "commit": "ec358ed70b472051c0c3e8b4d07d2e89ae146a80",
-  "committed": "2026-10-14T01:07:20+01:00",
+  "commit": "bc4159892f58cae1c1dcc110cb0d9674ce3c6ec4",
+  "committed": "2026-10-14T07:45:31+01:00",
   "files": {
     "src/lib/engine/vendor/context/text.ts": {
       "from": "ts/src/context/text.ts",
@@ -13,7 +13,7 @@
     },
     "src/lib/engine/vendor/engine_data.json": {
       "from": "ts/src/engine_data.json",
-      "sha256": "0f43325c271ac590b098990377fca6004c45dc259d77c1f50fd2b332297acbb9"
+      "sha256": "e40dd954a0f4e1c01b06845fce81d6942e4260289445026d42dfbde035573e47"
     },
     "src/lib/engine/vendor/policy/capabilities.ts": {
       "from": "ts/src/policy/capabilities.ts",
@@ -21,7 +21,7 @@
     },
     "src/lib/engine/vendor/policy/catalogue.ts": {
       "from": "ts/src/policy/catalogue.ts",
-      "sha256": "adab8ed667e681003bb2a18da6667ece50145cd3bf4dc549611e8acb80ba5f6a"
+      "sha256": "67a2e56fddc22de72e1bd05c9f4af4a79a598cae642ce4ca4ab2f6d11b8715a5"
     },
     "src/lib/engine/vendor/policy/depth.ts": {
       "from": "ts/src/policy/depth.ts",
@@ -29,11 +29,11 @@
     },
     "src/lib/engine/vendor/policy/engine.ts": {
       "from": "ts/src/policy/engine.ts",
-      "sha256": "3b9fea2ff93b271efb6e17f2cb675ada53cac9620ba332b6b0b3d04f11394d30"
+      "sha256": "67c26af90cffbd5d293e3647ef8c7644137918ce8026ead6140a54c4b168b7e8"
     },
     "src/lib/engine/vendor/policy/index.ts": {
       "from": "ts/src/policy/index.ts",
-      "sha256": "b18ed580c9a7b60182e9d261699a056381034aeb75a37a10672e5b240fb6b219"
+      "sha256": "ef30905b0fcc30061a334c7d9d5a32c2b4bc1488616fa5ecb309124c74cedd9a"
     },
     "src/lib/engine/vendor/policy/labels.ts": {
       "from": "ts/src/policy/labels.ts",
@@ -45,11 +45,15 @@
     },
     "src/lib/engine/vendor/policy/study.ts": {
       "from": "ts/src/policy/study.ts",
-      "sha256": "e1d5395237144115bff759ac182e11099fb1f931160fe950aa85ef5213da3a7f"
+      "sha256": "34d90f7237349302fdf520aac9006c85929d045520724bedfbbdfa1234d70be1"
+    },
+    "src/lib/engine/vendor/policy/utility.ts": {
+      "from": "ts/src/policy/utility.ts",
+      "sha256": "417d8f84548bb9e6b67acf7de10488be204b7025db50e5e2f0b7de0dc6dd4126"
     },
     "src/lib/engine/vendor/policy_data.json": {
       "from": "ts/src/policy_data.json",
-      "sha256": "b5824a9b06981d329097de1c4b3b36b4340008897f35b3db1a78308d13bfd5f0"
+      "sha256": "f317610b812732c8103ebf2adc9283e3228b3b9d0aabce30caf375df8c7d33ad"
     },
     "src/lib/engine/vendor/rng.ts": {
       "from": "ts/src/rng.ts",
@@ -57,11 +61,19 @@
     },
     "tests/fixtures/policy_fixtures.json": {
       "from": "fixtures/policy_fixtures.json",
-      "sha256": "55f308182296be9326cff35c799c30ab2252b7473a98ec5af59c75d91408caba"
+      "sha256": "ac14f779e71ad9b0c799e0da2186e4a8284eb089b38a2dbb0205c088a6f7c0d7"
     },
     "src/data/policy_results.md": {
       "from": "fixtures/policy_results.md",
-      "sha256": "b3376f89b2866c09fbe48ff719f066d9af383e065551ea1e2bf8e1316232a647"
+      "sha256": "55701691d7e4fb3fdab713f325188bdc7d42b7d65b7a78fe52479d30de42a1d6"
+    },
+    "tests/fixtures/policy2_fixtures.json": {
+      "from": "fixtures/policy2_fixtures.json",
+      "sha256": "5898e1abd2e4e9dac3d34a987e1c2aea22f44e765162ef224c1b5cd1440ec18f"
+    },
+    "src/data/policy2_results.md": {
+      "from": "fixtures/policy2_results.md",
+      "sha256": "2544788dfbb106420bbe39b6df4f0f39ce93173e1515ab0a472b2c0385a94e54"
     }
   }
 }

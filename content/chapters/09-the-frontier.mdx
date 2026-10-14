@@ -1,0 +1,55 @@
+<FrontierWidget>
+  <Eq
+    label="A defence's utility is the share of benign tasks it lets finish; its risk is the mean, over the same tasks, of base rate times detector misses times the best route's pass probability"
+    tex="\begin{gathered} \text{utility}(d) = \frac{1}{N} \sum_{t} \text{keep}(t, d) \\ \text{risk}(d) = \frac{1}{N} \sum_{t} \htmlClass{hl-base}{p} \cdot \htmlClass{hl-det}{P_{\text{miss}}(d)} \cdot \htmlClass{hl-route}{\max_{r} \text{pass}_r(t, d)} \end{gathered}"
+  />
+</FrontierWidget>
+
+<Layer kind="concept">
+
+Every defence in this site has a price. The label policy blocks tasks the user wanted; approvals cost attention; detectors add model calls and flag some benign results; a planner adds a call and cannot do every task unattended. The engine measures the price and the protection **on the same tasks**: a suite of <V of="fr.n" fmt="int" /> benign tasks drawn with its seeded generator (each reads one to three sources, summarises them and answers, saves a file or sends a message; <V of="fr.adaptive_share" fmt="pct" /> branch on what they read). For each of <V of="fr.defences" fmt="int" /> defences it counts the tasks that finish, the prompts and the extra calls, and the chance that one steering attempt in a task's untrusted input ends in a write or send that nothing stops. Threats appear only as that abstract event.
+
+The animation adds one defence per step to the plot: tasks finished across, risk up (on a log scale, so each gridline is ten times the last). A filled point is on the **frontier**: no other defence is at least as good on tasks finished, risk and prompts, and better on one. Switch the attacker:
+
+- **Fixed attacks**, the published rates: the detectors look best. Three layers leave a risk of <V of="fr.fixed.detectors.risk" fmt="pct2" /> per task and still finish <V of="fr.fixed.detectors.utility" fmt="pct1" /> of tasks, but those rates were measured against fixed sets of attacks ([chapter 6](/learn/06-detection-is-not-enough)).
+- **An attacker who adapts**, getting past every detector ([Zhan et al. 2025](https://arxiv.org/abs/2503.00061): over 50% success against all eight defences tested) at a <V of="fr.adaptive.base" fmt="pct" /> base rate: the detectors fall back to the undefended risk, <V of="fr.adaptive.detectors.risk" fmt="pct1" />. The designs that never read content do not move. The label policy alone leaves <V of="fr.adaptive.policy.risk" fmt="pct1" />; adding least privilege takes that to <V of="fr.adaptive.least.risk" fmt="pct1" /> **at no cost in tasks** (both finish <V of="fr.adaptive.least.utility" fmt="pct1" />); planning in advance with least privilege leaves <V of="fr.adaptive.planned.risk" fmt="pct1" /> and finishes <V of="fr.adaptive.planned.utility" fmt="pct1" />, with <V of="fr.adaptive.planned.prompts" fmt="f2" /> prompts and <V of="fr.adaptive.planned.extra" fmt="f2" /> extra call per task. Approving every write and send finishes everything and leaves <V of="fr.adaptive.approve_all.risk" fmt="pct1" />, paid in attention (<V of="fr.adaptive.approve_all.prompts" fmt="f2" /> prompts per task, with the fatigue of [chapter 8](/learn/08-humans-in-the-loop)).
+
+What does the policy block? Every blocked task traces to one rule: a send carrying data from untrusted, private sources (an inbox) to anyone but the user, in <V of="fr.fixed.policy.by_rule.untrusted-egress-private" fmt="int" /> of the <V of="fr.n" fmt="int" /> tasks (<V of="fr.fixed.policy.blocked" fmt="pct1" />). A real deployment would make choices here, for example allowing colleagues as destinations and taking that risk back; the frontier is a menu of such choices, not a verdict. For scale: on AgentDojo, CaMeL kept <V of="fr.camel_ratio" fmt="pct" /> of the undefended system's solved tasks (<V of="pub.camel_secure" fmt="pct" /> against <V of="pub.camel_undefended" fmt="pct" />, [Debenedetti et al. 2025](https://arxiv.org/abs/2503.18813)); this suite's figures are not comparable with that, only the shape is.
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The suite's mix of tasks, the detector false-positive rates (provenance marking's is 0, after Spotlighting's "minimal impact on task efficacy"), the approval miss rates, the one-attempt-per-task model and the adaptive setting's "every detector passed" are illustrative; the base rates come from InjecAgent and Spotlighting. The decisions, prompts and routes follow from the policy's rules on each task. A different suite or rule set moves every point.
+
+</Callout>
+
+<Layer kind="maths">
+
+For task $t$ and defence $d$: $\text{keep}(t,d)$ is 0 if the policy blocks a call the task needs, and otherwise $\prod_i (1 - f_i)^{s_i}$ for detector layers with false-positive rate $f_i$ scanning $s_i$ items. The risk is $p \cdot P_{\text{miss}}(d) \cdot \max_r \text{pass}_r(t,d)$, with $P_{\text{miss}}$ the common-mode mixture of [chapter 6](/learn/06-detection-is-not-enough) and the routes of [chapter 8](/learn/08-humans-in-the-loop). Averages over the $N$ tasks give each defence's point. A point $a$ is beaten by $b$ when $b$ finishes at least as many tasks, with at most the risk and at most the prompts, and is strictly better in one; the frontier is the points nobody beats. The engine's tests check the closed forms against a seeded simulation (planning in advance: <V of="fr.sim.risk" fmt="pct2" /> simulated over <V of="fr.sim.n" fmt="int" /> task draws, against <V of="fr.fixed.planned.risk" fmt="pct2" /> computed), that least privilege never adds risk or blocks a benign task, that an adaptive attacker never lowers risk, and the frontier against its definition on random point sets.
+
+</Layer>
+
+<Layer kind="code">
+
+The frontier's test, cut from the vendored engine (`policy/utility.ts`).
+
+```ts
+if (
+  b.utility >= a.utility &&
+  b.risk <= a.risk &&
+  b.prompts <= a.prompts &&
+  (b.utility > a.utility || b.risk < a.risk || b.prompts < a.prompts)
+)
+  beaten = true;
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Evals Explained: cost-aware evaluation](https://agent-evals-explained.vercel.app/learn/10-cost-aware-evaluation), Pareto fronts of cost against success.
+- [/data](/data), every defence's numbers on both settings, and the rules that block each task.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
+
+</Callout>

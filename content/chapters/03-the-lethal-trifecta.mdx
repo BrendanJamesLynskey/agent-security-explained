@@ -25,7 +25,7 @@ The circles are assigned from the abstract tools' declared labels; a real tool's
 
 Let $P$, $U$ and $O$ be the sets of held tools in each circle. A flow out needs a context that is both untrusted and private when an outbound call is made. In a classic agent the context is the join of everything read (chapter 2), so it reaches $(\text{untrusted}, \text{private})$ exactly when some read in $P$ and some read in $U$ have run (one tool may be in both), and an outbound tool in $O$ can then be called. Hence a flow out exists if and only if all three sets are non-empty, and two reads plus one send (three calls) always suffice, which is why the search stops at three.
 
-Removing a circle is therefore a **structural** defence: it does not depend on detecting anything. Its cost is that the task may need the tool you removed. Least privilege (chapter 4) asks which circles a task needs; splitting a task so no single context holds all three is the idea behind several of the design patterns in chapter 7 (part two).
+Removing a circle is therefore a **structural** defence: it does not depend on detecting anything. Its cost is that the task may need the tool you removed. Least privilege (chapter 4) asks which circles a task needs; splitting a task so no single context holds all three is the idea behind several of the design patterns in [chapter 7](/learn/07-designs-that-make-it-structural).
 
 </Layer>
 

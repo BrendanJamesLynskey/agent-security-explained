@@ -19,7 +19,7 @@ const norm = (x: unknown) => JSON.parse(JSON.stringify(x));
 describe("vendored engine", () => {
   it("every file matches the SHA-256 recorded with its commit", () => {
     const files = Object.entries(VENDORED.files);
-    expect(files.length).toBe(15);
+    expect(files.length).toBe(18);
     expect(VENDORED.commit).toMatch(/^[0-9a-f]{40}$/);
     for (const [path, rec] of files)
       expect(sha(readFileSync(join(ROOT, path))), path).toBe(rec.sha256);
@@ -35,11 +35,14 @@ describe("vendored engine", () => {
       "ts/src/policy/sandbox.ts",
       "ts/src/policy/depth.ts",
       "ts/src/policy/study.ts",
+      "ts/src/policy/utility.ts",
       "ts/src/policy/index.ts",
       "ts/src/policy_data.json",
       "ts/src/rng.ts",
       "fixtures/policy_fixtures.json",
       "fixtures/policy_results.md",
+      "fixtures/policy2_fixtures.json",
+      "fixtures/policy2_results.md",
     ])
       expect(froms).toContain(f);
   });
@@ -49,7 +52,7 @@ describe("vendored engine", () => {
     const fx = JSON.parse(
       readFileSync(join(ROOT, "tests/fixtures/policy_fixtures.json"), "utf8"),
     ) as Obj;
-    expect(fx.engine).toBe("1.10.0");
+    expect(fx.engine).toBe("1.11.0");
     for (const r of fx.lattice as Obj[]) {
       expect(P.labels.join(r.a, r.b)).toEqual(r.join);
       expect(P.labels.leq(r.a, r.b)).toBe(r.leq);
@@ -62,6 +65,20 @@ describe("vendored engine", () => {
     expect(norm(S.depthStudy())).toEqual(fx.study.depth);
     for (const p of P.catalogue.PLAN_ORDER)
       expect(norm(S.contextFrames(p))).toEqual(fx.study.context[p]);
+  });
+
+  it("the engine's part-two fixtures are reproduced by the vendored port", async () => {
+    const { P } = await import("@/lib/engine");
+    const fx = JSON.parse(
+      readFileSync(join(ROOT, "tests/fixtures/policy2_fixtures.json"), "utf8"),
+    ) as Obj;
+    expect(fx.engine).toBe("1.11.0");
+    const suite = P.utility.makeSuite();
+    expect(norm(suite)).toEqual(fx.suite);
+    expect(norm(P.utility.frontier(false, suite))).toEqual(fx.frontier.fixed);
+    expect(norm(P.utility.frontier(true, suite))).toEqual(fx.frontier.adaptive);
+    for (const c of fx.study.checklist as Obj[])
+      expect(norm(P.study.checklist(c.design, suite))).toEqual(c);
   });
 
   it("the site's fixtures come from the same commit", () => {

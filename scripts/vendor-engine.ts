@@ -57,6 +57,9 @@ for (const p of list("ts/src"))
 // engine 1.10: the policy module's parity fixtures and its recorded results
 map["fixtures/policy_fixtures.json"] = "tests/fixtures/policy_fixtures.json";
 map["fixtures/policy_results.md"] = "src/data/policy_results.md";
+// engine 1.11: part two (the utility-cost model, the frontier, chapters 6 to 10)
+map["fixtures/policy2_fixtures.json"] = "tests/fixtures/policy2_fixtures.json";
+map["fixtures/policy2_results.md"] = "src/data/policy2_results.md";
 
 const files: Record<string, { from: string; sha256: string }> = {};
 for (const [from, to] of Object.entries(map)) {

@@ -1,0 +1,54 @@
+<DualWidget>
+  <Eq
+    label="The plan comes from the request alone; a call's label joins its arguments and, where the plan branches on a value, that value's label"
+    tex="\begin{gathered} \htmlClass{hl-plan}{\text{plan} = \text{planner}(\text{request})} \\ \ell(\text{call}) = \htmlClass{hl-args}{\bigsqcup_{a \,\in\, \text{args}} \ell(a)} \;\sqcup\; \htmlClass{hl-ctrl}{\bigsqcup_{v \,\in\, \text{branch}} \ell(v)} \end{gathered}"
+  />
+</DualWidget>
+
+<Layer kind="concept">
+
+[Chapter 6](/learn/06-detection-is-not-enough) ended with detectors that never reach zero. The designs in this chapter take a different route: they arrange the agent so that untrusted text **cannot** choose what the agent does, whatever the text says, and so nothing has to recognise it.
+
+The **dual-model pattern** ([Willison 2023](https://simonwillison.net/2023/Apr/25/dual-llm-pattern/)) splits the agent in two. A **privileged** model plans and calls tools but never reads untrusted content; a **quarantined** model reads untrusted content but has no tools, and its outputs come back as variables the privileged model refers to by name only. **CaMeL** ([Debenedetti et al. 2025](https://arxiv.org/abs/2503.18813)) makes this precise: the planner writes the whole plan as a program from the user's request, an interpreter runs it and tracks where every value came from, and a policy checks each tool call against those labels, so "the untrusted data retrieved by the LLM can never impact the program flow". [Beurer-Kellner et al. (2025)](https://arxiv.org/abs/2506.08837) collect six such patterns (plan-then-execute and the dual model among them) and weigh what each gives up.
+
+The animation runs a task this way. The planner reads the request and writes the plan; each read runs as a tool, and its result goes into a variable the planner never sees (the panel lists what it does see: names). Rewriting untrusted values happens in the quarantined model. At every call the policy decides on the labels the interpreter holds, and beside it is the decision a classic agent gets for the same call. For "send a colleague a summary of my notes, after looking up a page", the planned run allows, asks and denies <V of="du.notes_then_page.planned.allow" fmt="int" />, <V of="du.notes_then_page.planned.ask" fmt="int" /> and <V of="du.notes_then_page.planned.deny" fmt="int" /> calls, where the classic agent's are <V of="du.notes_then_page.classic.allow" fmt="int" />, <V of="du.notes_then_page.classic.ask" fmt="int" /> and <V of="du.notes_then_page.classic.deny" fmt="int" />: the page cannot taint a summary that was never made from it.
+
+Two things the design does **not** do. It does not clean data: in "read my inbox and notes, then reply to a colleague" the reply is still made from untrusted, private text, and the policy denies it in both agents (<V of="du.reply_from_notes.planned.deny" fmt="int" /> denial each). And some tasks really do depend on what they read. In "file a ticket's summary wherever its category says", the plan has to branch on the ticket's content. The engine records the branch (the step's `ctrl`), so the write's control is the ticket's label, untrusted, and the policy sends it for approval: the dependency is tracked, not hidden. The price of the design is one extra model call per task to write the plan (<V of="du.notes_then_page.extra" fmt="int" /> here), and the tasks it can no longer do unattended. On the AgentDojo benchmark, CaMeL solved <V of="pub.camel_secure" fmt="pct" /> of tasks with provable security, against <V of="pub.camel_undefended" fmt="pct" /> for the undefended system.
+
+</Layer>
+
+<Callout kind="illustrative">
+
+The tasks, tools and the single extra planner call are abstract placeholders; real planners may need several calls, and a real interpreter tracks much finer capabilities than this engine's two-part labels. CaMeL's figures are quoted from its paper, on its models and benchmark.
+
+</Callout>
+
+<Layer kind="maths">
+
+Write $\ell(v)$ for a value's label. Planned in advance, a call made at step $k$ has control label $\bigsqcup_{v \in B_k} \ell(v)$, where $B_k$ is the set of values the plan branches on at that step (empty for most steps, giving the bottom of the lattice), and effective label
+
+$$
+\ell(\text{call}_k) = \bigsqcup_{a \in \text{args}_k} \ell(a) \;\sqcup\; \bigsqcup_{v \in B_k} \ell(v).
+$$
+
+In a classic agent, $B_k$ is effectively everything returned before step $k$, so the planned label is never higher: $\ell_{\text{planned}}(\text{call}_k) \sqsubseteq \ell_{\text{classic}}(\text{call}_k)$, and since the policy's decisions are monotone in the label ([chapter 1](/learn/01-trust-boundaries)), a planned call is never more restricted than the same call in a classic agent. The engine's tests check both on every frame, and that dropping a branch never makes a decision stricter.
+
+</Layer>
+
+<Layer kind="code">
+
+How a branch enters the engine, cut from the vendored engine (`policy/engine.ts`): the values a step branches on are inputs it must wait for, like its arguments.
+
+```ts
+const ctrl: string[] = st.ctrl ?? [];
+const missing = [...(st.args as string[]), ...ctrl].filter((a) => !(a in vals));
+```
+
+</Layer>
+
+<Callout kind="deeper">
+
+- [Agent Orchestration Explained](https://agent-orchestration-explained.vercel.app): planners, workers and graphs, the machinery plan-then-execute is built from.
+- [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/) and [LLM Hub: Computer Use](https://brendanjameslynskey.github.io/LLM_Hub_Computer_Use/).
+
+</Callout>

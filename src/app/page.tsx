@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { SECTIONS } from "@/lib/mdx/sections";
-import { PLANNED } from "@/lib/planned";
 import { formatValue, lookup } from "@/lib/security/values";
 import {
   CONTEXT_URL,
@@ -47,7 +46,9 @@ export default function HomePage(): JSX.Element {
             to label every value by where it came from and how secret it is, why
             a model cannot be trusted to tell data from instructions, the three
             capabilities that must never meet, least privilege and
-            audience-bound tokens, and the sandbox around a tool&apos;s process.
+            audience-bound tokens, the sandbox around a tool&apos;s process, why
+            detectors never reach zero, designs that make safety structural,
+            approvals that stay worth reading, and what every defence costs.
             Threats appear only as the categories their papers name; there are
             no attack recipes here.
           </p>
@@ -60,7 +61,13 @@ export default function HomePage(): JSX.Element {
             policy engine over abstract labels, never content. Over all{" "}
             {v("tri.n", "int")} subsets of its {v("consts.tools", "int")} tools,
             the trifecta check agrees with an exhaustive search for a way out on{" "}
-            {v("tri.agree", "int")}. No language model runs anywhere.
+            {v("tri.agree", "int")}. On a suite of {v("fr.n", "int")} benign
+            tasks, planning in advance with least privilege finishes{" "}
+            {v("fr.adaptive.planned.utility", "pct1")} of them and leaves a
+            steered attempt {v("fr.adaptive.planned.risk", "pct1")} of tasks
+            against an adaptive attacker, where no defence leaves{" "}
+            {v("fr.adaptive.none.risk", "pct1")}. No language model runs
+            anywhere.
           </p>
         </div>
         <figure className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
@@ -139,9 +146,6 @@ export default function HomePage(): JSX.Element {
           </Link>
         ))}
       </nav>
-      <p className="mt-8 text-sm text-neutral-600 dark:text-neutral-400">
-        Coming next: {PLANNED.join("; ")}.
-      </p>
       <p className="mt-12 text-sm text-neutral-600 dark:text-neutral-400">
         The sixth of a family of agent sites, after{" "}
         <a href={HARNESSES_URL} className={LINK}>

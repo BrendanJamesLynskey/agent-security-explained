@@ -70,6 +70,36 @@ const CLIPS: Clip[] = [
     widget: "sandbox-widget",
     fps: 1,
   },
+  {
+    name: "depth",
+    path: "/learn/06-detection-is-not-enough",
+    widget: "depth-widget",
+    fps: 1,
+  },
+  {
+    name: "dual",
+    path: "/learn/07-designs-that-make-it-structural",
+    widget: "dual-widget",
+    fps: 1,
+  },
+  {
+    name: "approval",
+    path: "/learn/08-humans-in-the-loop",
+    widget: "approval-widget",
+    fps: 1,
+  },
+  {
+    name: "frontier",
+    path: "/learn/09-the-frontier",
+    widget: "frontier-widget",
+    fps: 1,
+  },
+  {
+    name: "checklist",
+    path: "/learn/10-a-builders-checklist",
+    widget: "checklist-widget",
+    fps: 1,
+  },
 ];
 
 async function main(): Promise<void> {

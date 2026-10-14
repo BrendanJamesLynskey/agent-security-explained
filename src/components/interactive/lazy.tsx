@@ -43,3 +43,23 @@ export const SandboxWidget = dynamic(() => import("./SandboxWidget"), {
   ssr: false,
   loading: loading("animation"),
 });
+export const DepthWidget = dynamic(() => import("./DepthWidget"), {
+  ssr: false,
+  loading: loading("animation"),
+});
+export const DualWidget = dynamic(() => import("./DualWidget"), {
+  ssr: false,
+  loading: loading("animation"),
+});
+export const ApprovalWidget = dynamic(() => import("./ApprovalWidget"), {
+  ssr: false,
+  loading: loading("animation"),
+});
+export const FrontierWidget = dynamic(() => import("./FrontierWidget"), {
+  ssr: false,
+  loading: loading("animation"),
+});
+export const ChecklistWidget = dynamic(() => import("./ChecklistWidget"), {
+  ssr: false,
+  loading: loading("animation"),
+});

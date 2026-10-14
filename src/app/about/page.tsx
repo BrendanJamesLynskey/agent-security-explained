@@ -25,7 +25,7 @@ import {
 export const metadata = {
   title: "About",
   description:
-    "What Agent Security Explained's policy engine computes, how it is tested (lattice laws, soundness on every small plan, an exhaustive search behind the trifecta check), what is illustrative, and how Python and the browser are checked to agree exactly.",
+    "What Agent Security Explained's policy engine computes, how it is tested (lattice laws, soundness on every small plan, an exhaustive search behind the trifecta check, the cost-and-risk model against simulation), what is illustrative, and how Python and the browser are checked to agree exactly.",
 };
 
 const A =
@@ -78,10 +78,12 @@ export default function AboutPage(): JSX.Element {
           <a href={INFERENCE_URL} className={A}>
             LLM Inference Explained
           </a>{" "}
-          and others, all in the header&apos;s menu). Chapters 6 to 10
-          (detection, structural designs, humans in the loop, the
-          security–utility frontier and a checklist) are the site&apos;s second
-          part.
+          and others, all in the header&apos;s menu). Chapters 6 to 10 weigh the
+          defences: why detection never reaches zero, designs that make safety
+          structural, humans in the loop, what each defence costs on a suite of{" "}
+          {v("fr.n", "int")} benign tasks against what it leaves (the
+          security–utility frontier), and a checklist that audits a design
+          against every chapter.
         </p>
 
         <h2>Labels, not content</h2>
@@ -132,6 +134,14 @@ export default function AboutPage(): JSX.Element {
             every one of the {v("tri.n", "int")} subsets of the tools; the
             sandbox layers only ever stop more as layers are added; the
             defence-in-depth formulas match a seeded simulation;
+          </li>
+          <li>
+            the cost and risk of every defence on the benign suite match a
+            seeded simulation; least privilege never adds risk or blocks a
+            benign task; an adaptive attacker never lowers risk; each approval
+            threshold asks at least as often as the one before; the frontier
+            matches its definition on random point sets; a plan that branches on
+            a value is never stricter once the branch is dropped;
           </li>
           <li>
             the TS port reproduces every fixture exactly, with no tolerance.
@@ -185,6 +195,20 @@ export default function AboutPage(): JSX.Element {
             The published rates hold for their papers&apos; models and test
             suites; they are not the rate for any other agent.
           </li>
+          <li>
+            Part two: the suite of benign tasks, two of the three detector
+            layers&apos; miss and false-positive rates, the approval miss rates
+            and fatigue, one steering attempt per task, the planner&apos;s one
+            extra call, the checklist&apos;s thresholds and{" "}
+            {v("ck.budget", "pct")} risk budget, and the adaptive
+            attacker&apos;s &ldquo;every detector passed&rdquo; (a bound read
+            from{" "}
+            <a href={ARXIV(PAPERS.adaptive)} className={A}>
+              Zhan et al. 2025
+            </a>
+            ). Threats are only ever an abstract event: an attempt, a route, a
+            label.
+          </li>
         </ul>
 
         <h2>Accessibility</h2>
@@ -204,7 +228,7 @@ export default function AboutPage(): JSX.Element {
           <a href={GITHUB_URL} className={A}>
             GitHub
           </a>{" "}
-          (MIT). The design patterns behind part two are surveyed by{" "}
+          (MIT). The design patterns behind chapter 7 are surveyed by{" "}
           <a href={ARXIV(PAPERS.patterns)} className={A}>
             Beurer-Kellner et al. (2025)
           </a>

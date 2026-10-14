@@ -32,7 +32,15 @@ export const PAPERS = {
   spotlighting: "2403.14720",
   camel: "2503.18813",
   patterns: "2506.08837",
+  adaptive: "2503.00061",
 } as const;
+
+/** Claude Code's sandboxing write-up (approval fatigue, fewer prompts; opened 2026-10-14). */
+export const SANDBOXING_POST =
+  "https://www.anthropic.com/engineering/claude-code-sandboxing";
+/** The dual-model pattern (opened 2026-10-14). */
+export const DUAL_LLM_URL =
+  "https://simonwillison.net/2023/Apr/25/dual-llm-pattern/";
 
 /** The term "lethal trifecta" (opened 2026-10-14). */
 export const TRIFECTA_URL =

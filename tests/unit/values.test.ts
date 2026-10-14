@@ -15,6 +15,11 @@ const RESULTS = readFileSync(
   join(__dirname, "../../src/data/policy_results.md"),
   "utf8",
 );
+const RESULTS2 = readFileSync(
+  join(__dirname, "../../src/data/policy2_results.md"),
+  "utf8",
+);
+const p1 = (x: number, d = 1) => `${(x * 100 + 0).toFixed(d)}%`;
 
 describe("every quoted value resolves", () => {
   for (const f of readdirSync(DIR).filter((x) => x.endsWith(".mdx"))) {
@@ -36,6 +41,7 @@ describe("formats and lookups", () => {
     expect(formatValue(1234, "int")).toBe("1,234");
     expect(formatValue(0.5, "pct")).toBe("50%");
     expect(formatValue(0.6825, "pct1")).toBe("68.3%");
+    expect(formatValue(0.00576, "pct2")).toBe("0.58%");
     expect(formatValue(1.23456, "num")).toBe("1.23");
     expect(formatValue(1.234, "f2")).toBe("1.23");
     expect(formatValue("x", "raw")).toBe("x");
@@ -82,5 +88,38 @@ describe("the prose agrees with the engine's recorded results", () => {
   it("published measurements", () => {
     for (const x of P.catalogue.PUBLISHED)
       expect(RESULTS).toContain(`| ${x.what} | ${x.text} | ${x.arxiv} |`);
+  });
+  it("part two: the frontier, both settings", () => {
+    for (const key of ["fixed", "adaptive"])
+      for (const d of P.catalogue.DEFENCES) {
+        const p = t.fr[key][d.id] as Obj;
+        expect(RESULTS2).toContain(
+          `| ${d.name} | ${p1(p.utility)} | ${p1(p.blocked)} | ${p.prompts.toFixed(2)} | ${p.extra.toFixed(2)} | ${p1(p.risk, 2)} | ${p1(p.ungated)} | ${p.front ? "yes" : "no"} |`,
+        );
+      }
+  });
+  it("part two: approval thresholds and fatigue", () => {
+    for (const th of P.catalogue.UTILITY.thresholds as string[]) {
+      const s = t.ap[th] as Obj;
+      expect(RESULTS2).toContain(
+        `| ${th} | ${p1(s.utility)} | ${s.prompts.toFixed(2)} | ${p1(s.risk, 2)} | ${p1(s.ungated)} |`,
+      );
+    }
+    expect(RESULTS2).toContain(`4: ${p1(t.ap.fatigue.n4)}`);
+  });
+  it("part two: attempts through the layers and plan-then-execute", () => {
+    const r = t.dp.run["c0.01"] as Obj;
+    expect(RESULTS2).toContain(`| 1.0% | ${r.f0} (`);
+    expect(RESULTS2).toContain(` | ${r.f4} (`);
+    for (const p of P.catalogue.DUAL_PLANS) {
+      const d = t.du[p] as Obj;
+      const a = (s: Obj) => `${s.allow} / ${s.ask} / ${s.deny}`;
+      expect(RESULTS2).toContain(
+        `| ${d.title} | ${a(d.planned)} | ${a(d.classic)} |`,
+      );
+    }
+  });
+  it("part two: the checklist", () => {
+    expect(RESULTS2).toContain(`| planned | ${t.ck.passed} / 9 |`);
   });
 });
