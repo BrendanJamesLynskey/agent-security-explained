@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/BrendanJamesLynskey/Agent_Loop_Sim",
-  "commit": "50f68acfda2e431009121373e9e433300bbed44c",
-  "committed": "2026-10-14T00:38:24+01:00",
+  "commit": "ec358ed70b472051c0c3e8b4d07d2e89ae146a80",
+  "committed": "2026-10-14T01:07:20+01:00",
   "files": {
     "src/lib/engine/vendor/context/text.ts": {
       "from": "ts/src/context/text.ts",
