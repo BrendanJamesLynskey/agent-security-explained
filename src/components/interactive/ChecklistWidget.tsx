@@ -27,6 +27,17 @@ export const VERDICT_COLOUR: Record<string, string> = {
   fail: OKABE_ITO.vermillion,
 };
 const MARK: Record<string, string> = { pass: "✓", warn: "!", fail: "✕" };
+/** Verdict text: darker shades of the same hues, for contrast on a light or dark background. */
+const TEXT: Record<string, string> = {
+  pass: "text-emerald-800 dark:text-emerald-300",
+  warn: "text-amber-800 dark:text-amber-300",
+  fail: "text-red-800 dark:text-red-300",
+};
+const FILL: Record<string, string> = {
+  pass: "fill-emerald-800 dark:fill-emerald-300",
+  warn: "fill-amber-800 dark:fill-amber-300",
+  fail: "fill-red-800 dark:fill-red-300",
+};
 const ALL_LAYERS = ["fs_scope", "container", "egress"];
 
 export default function ChecklistWidget({
@@ -127,8 +138,8 @@ function Checklist({
                 y={y + fs * 3.3}
                 textAnchor="middle"
                 style={{ fontSize: fs * 1.25 }}
-                fill={done ? c : MUTED.light}
-                className="font-bold"
+                fill={done ? undefined : MUTED.light}
+                className={`font-bold ${done ? FILL[g.verdict] : ""}`}
               >
                 {done ? `${MARK[g.verdict]} ${g.verdict}` : "·"}
               </text>
@@ -146,10 +157,7 @@ function Checklist({
               className={`grid grid-cols-[3.2rem_minmax(0,1fr)] items-baseline gap-2 rounded px-2 py-0.5 ${i === s.step ? "bg-white ring-1 ring-neutral-300 dark:bg-neutral-950 dark:ring-neutral-700" : ""}`}
             >
               <span
-                className="font-mono font-bold"
-                style={{
-                  color: i <= s.step ? VERDICT_COLOUR[g.verdict] : undefined,
-                }}
+                className={`font-mono font-bold ${i <= s.step ? TEXT[g.verdict] : ""}`}
               >
                 {i <= s.step ? `${MARK[g.verdict]} ${g.verdict}` : "·"}
               </span>
