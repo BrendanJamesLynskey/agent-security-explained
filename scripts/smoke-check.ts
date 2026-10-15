@@ -42,6 +42,7 @@ const SWITCH = [
   'data-site-group="foundations"',
   'data-site-group="hardware"',
   'href="https://ai-racks-explained.vercel.app"',
+  'href="https://ai-accelerators-explained.vercel.app"',
   'href="https://agent-evals-explained.vercel.app"',
   'href="https://agent-security-explained.vercel.app" title="Agent Security Explained: threats and defences" data-site-key="security" aria-current="true"',
   'data-site-place="security"',
