@@ -9,12 +9,13 @@ import Link from "next/link";
 
 import { SECTIONS } from "@/lib/mdx/sections";
 import { AGENTS_HUB } from "@/lib/site";
+import { withShare } from "@/lib/share";
 
-export const metadata = {
+export const metadata = withShare("/learn", {
   title: "Learn",
   description:
     "Chapters on agent security, defences only: trust boundaries, untrusted input, the lethal trifecta, least privilege and scoped credentials, sandboxing, detection, structural designs, humans in the loop, the security–utility frontier and a builder's checklist, each built around an animation driven by a tested policy engine.",
-};
+});
 
 export default function LearnIndex(): JSX.Element {
   return (

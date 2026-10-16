@@ -138,6 +138,15 @@ the sandbox's layer logic are exact for the model as stated.
 | Lighthouse ≥ 0.9 (performance, accessibility, best practices)                                                                                                                              | CI "Lighthouse"                                       |
 | Lattice laws; labels against an independent provenance computation and soundness on every plan of up to three calls; monotonicity; trifecta against exhaustive search; TS port bit for bit | Agent_Loop_Sim CI (`tests/test_policy.py`, `ts/test`) |
 | Cost and risk against a seeded simulation; least privilege never adds risk; adaptive never lowers it; approval thresholds ordered; the frontier against its definition                     | Agent_Loop_Sim CI (`tests/test_policy2.py`)           |
+| Link-preview tags and 1,200 × 630 cards, favicon and Apple icon, sitemap and robots; the landing page's start button, "How this is checked" strip and hero figure above the fold at 390 px | CI "E2E Tests" (`tests/e2e/sharing.spec.ts`)          |
+
+## Sharing
+
+Every page carries Open Graph and Twitter tags, titled and addressed as that page. The link-preview cards (1,200 × 630 PNG)
+are drawn at build time by [`src/app/_og/card.tsx`](src/app/_og/card.tsx), the same file on every companion site, from
+this site's [`src/lib/share.ts`](src/lib/share.ts): one for the site and one per chapter. The favicon
+([`src/app/icon.svg`](src/app/icon.svg)) is the Agents track's speech bubble with this site's letter, S; [`/sitemap.xml`](src/app/sitemap.ts) lists every page and
+[`/robots.txt`](src/app/robots.ts) allows everything.
 
 ## Develop
 

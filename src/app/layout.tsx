@@ -10,10 +10,11 @@ import type { ReactNode } from "react";
 
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { SITE_URL } from "@/lib/site";
+import { withShare } from "@/lib/share";
 
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withShare("/", {
   metadataBase: new URL(SITE_URL),
   title: {
     default: "Agent Security Explained",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
   },
   description:
     "How to build agents that stay safe: trust boundaries, labels on every value, untrusted input, the lethal trifecta, least privilege and scoped credentials, sandboxing, detection, structural designs, humans in the loop and the security–utility frontier, each animated by a tested policy engine. Defences only.",
-};
+});
 
 export default function RootLayout({
   children,

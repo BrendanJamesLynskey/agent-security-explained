@@ -1,5 +1,7 @@
+import type { Route } from "next";
 import Link from "next/link";
 
+import { CheckedStrip, StartButton } from "@/components/ui/Landing";
 import { SECTIONS } from "@/lib/mdx/sections";
 import { formatValue, lookup } from "@/lib/security/values";
 import { ENGINE_URL } from "@/lib/site";
@@ -28,40 +30,20 @@ export default function HomePage(): JSX.Element {
       <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
         Agents that stay safe by design
       </h1>
-      <div className="mt-8 grid items-center gap-8 md:grid-cols-[1fr_minmax(0,22rem)]">
+      <div className="mt-6 grid items-start gap-8 md:grid-cols-[1fr_minmax(0,22rem)]">
         <div>
           <p className="max-w-2xl text-lg text-neutral-600 dark:text-neutral-300">
-            An agent reads text that anyone could have written, holds data that
-            should stay private, and can act on the world. This site is about
-            the <strong>defences</strong>: where the trust boundaries are, how
-            to label every value by where it came from and how secret it is, why
-            a model cannot be trusted to tell data from instructions, the three
-            capabilities that must never meet, least privilege and
-            audience-bound tokens, the sandbox around a tool&apos;s process, why
-            detectors never reach zero, designs that make safety structural,
-            approvals that stay worth reading, and what every defence costs.
-            Threats appear only as the categories their papers name; there are
-            no attack recipes here.
+            An interactive guide to the defences that keep AI agents safe, each
+            one animated by a tested policy engine.
           </p>
-          <p className="mt-4 max-w-2xl text-neutral-600 dark:text-neutral-300">
-            The animations are driven by{" "}
-            <a href={ENGINE_URL} className={LINK}>
-              Agent_Loop_Sim
-            </a>
-            &apos;s policy module, identically in Python and in your browser: a
-            policy engine over abstract labels, never content. Over all{" "}
-            {v("tri.n", "int")} subsets of its {v("consts.tools", "int")} tools,
-            the trifecta check agrees with an exhaustive search for a way out on{" "}
-            {v("tri.agree", "int")}. On a suite of {v("fr.n", "int")} benign
-            tasks, planning in advance with least privilege finishes{" "}
-            {v("fr.adaptive.planned.utility", "pct1")} of them and leaves a
-            steered attempt {v("fr.adaptive.planned.risk", "pct1")} of tasks
-            against an adaptive attacker, where no defence leaves{" "}
-            {v("fr.adaptive.none.risk", "pct1")}. No language model runs
-            anywhere.
-          </p>
+          <div className="mt-6">
+            <StartButton href={`/learn/${SECTIONS[0]!.slug}` as Route} />
+          </div>
         </div>
-        <figure className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <figure
+          data-hero-figure
+          className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+        >
           <svg
             viewBox="0 0 300 200"
             className="h-auto w-full"
@@ -120,6 +102,44 @@ export default function HomePage(): JSX.Element {
           </figcaption>
         </figure>
       </div>
+      <CheckedStrip href="/about#engine">
+        The trifecta check agrees with an exhaustive search on all{" "}
+        {v("tri.n", "int")} tool subsets, and the TypeScript engine in your
+        browser reproduces the Python reference&apos;s fixtures exactly.
+      </CheckedStrip>
+      <section aria-labelledby="learn-heading" className="mt-12">
+        <h2 id="learn-heading" className="text-xl font-semibold tracking-tight">
+          What you&apos;ll learn
+        </h2>
+        <p className="mt-4 max-w-2xl text-neutral-600 dark:text-neutral-300">
+          An agent reads text that anyone could have written, holds data that
+          should stay private, and can act on the world. This site is about the{" "}
+          <strong>defences</strong>: where the trust boundaries are, how to
+          label every value by where it came from and how secret it is, why a
+          model cannot be trusted to tell data from instructions, the three
+          capabilities that must never meet, least privilege and audience-bound
+          tokens, the sandbox around a tool&apos;s process, why detectors never
+          reach zero, designs that make safety structural, approvals that stay
+          worth reading, and what every defence costs. Threats appear only as
+          the categories their papers name; there are no attack recipes here.
+        </p>
+        <p className="mt-4 max-w-2xl text-neutral-600 dark:text-neutral-300">
+          The animations are driven by{" "}
+          <a href={ENGINE_URL} className={LINK}>
+            Agent_Loop_Sim
+          </a>
+          &apos;s policy module, identically in Python and in your browser: a
+          policy engine over abstract labels, never content. Over all{" "}
+          {v("tri.n", "int")} subsets of its {v("consts.tools", "int")} tools,
+          the trifecta check agrees with an exhaustive search for a way out on{" "}
+          {v("tri.agree", "int")}. On a suite of {v("fr.n", "int")} benign
+          tasks, planning in advance with least privilege finishes{" "}
+          {v("fr.adaptive.planned.utility", "pct1")} of them and leaves a
+          steered attempt {v("fr.adaptive.planned.risk", "pct1")} of tasks
+          against an adaptive attacker, where no defence leaves{" "}
+          {v("fr.adaptive.none.risk", "pct1")}. No language model runs anywhere.
+        </p>
+      </section>
       <nav aria-label="Chapters" className="mt-12 grid gap-4 sm:grid-cols-2">
         {SECTIONS.map((s, i) => (
           <Link

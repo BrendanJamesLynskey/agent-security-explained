@@ -5,3 +5,5 @@ src/lib/engine/vendor/, src/data/ and tests/fixtures/, at the commit recorded in
 src/lib/engine/vendor/VENDORED.json.
 
 Only the engine's policy module and the files it imports are vendored.
+
+The link-preview cards are set in Noto Sans and Noto Sans Mono (subsets in src/app/_og/), under the SIL Open Font License 1.1 (src/app/_og/OFL.txt).
