@@ -2,16 +2,7 @@ import Link from "next/link";
 
 import { SECTIONS } from "@/lib/mdx/sections";
 import { formatValue, lookup } from "@/lib/security/values";
-import {
-  CONTEXT_URL,
-  DECODER_URL,
-  ENGINE_URL,
-  EVALS_URL,
-  HARNESSES_URL,
-  INFERENCE_URL,
-  ORCHESTRATION_URL,
-  PROTOCOLS_URL,
-} from "@/lib/site";
+import { ENGINE_URL } from "@/lib/site";
 import { CIRCLE_COLOUR, DECISION_COLOUR } from "@/lib/viz/palette";
 
 const LINK =
@@ -147,36 +138,84 @@ export default function HomePage(): JSX.Element {
         ))}
       </nav>
       <p className="mt-12 text-sm text-neutral-600 dark:text-neutral-400">
-        The sixth of a family of agent sites, after{" "}
-        <a href={HARNESSES_URL} className={LINK}>
-          Agent Harnesses Explained
+        Part of a family of sixteen companion sites in four tracks, all in the
+        site menu above: Foundations (
+        <a
+          href="https://transformer-decoder-explained.vercel.app"
+          className={LINK}
+        >
+          Decoder
         </a>
         ,{" "}
-        <a href={PROTOCOLS_URL} className={LINK}>
-          Agent Protocols Explained
+        <a
+          href="https://transformer-training-explained.vercel.app"
+          className={LINK}
+        >
+          Training
+        </a>
+        ), Hardware (
+        <a href="https://gpu-kernels-explained.vercel.app" className={LINK}>
+          Kernels
         </a>
         ,{" "}
-        <a href={CONTEXT_URL} className={LINK}>
-          Agent Context Explained
+        <a href="https://systolic-arrays-explained.vercel.app" className={LINK}>
+          Systolic
         </a>
         ,{" "}
-        <a href={ORCHESTRATION_URL} className={LINK}>
-          Agent Orchestration Explained
-        </a>{" "}
-        and{" "}
-        <a href={EVALS_URL} className={LINK}>
-          Agent Evals Explained
+        <a href="https://ai-accelerators-explained.vercel.app" className={LINK}>
+          Accelerators
         </a>
-        , alongside the LLM-systems sites, from the{" "}
-        <a href={DECODER_URL} className={LINK}>
-          Transformer Decoder Explainer
-        </a>{" "}
-        to{" "}
-        <a href={INFERENCE_URL} className={LINK}>
-          LLM Inference Explained
-        </a>{" "}
-        (the site menu above lists them all). How this one was built, and how to
-        check it:{" "}
+        ,{" "}
+        <a href="https://ai-racks-explained.vercel.app" className={LINK}>
+          Racks
+        </a>
+        ), Inference (
+        <a href="https://llm-inference-explained.vercel.app" className={LINK}>
+          Serving
+        </a>
+        ,{" "}
+        <a
+          href="https://llm-architectures-explained.vercel.app"
+          className={LINK}
+        >
+          Architectures
+        </a>
+        ,{" "}
+        <a href="https://numerics-explained.vercel.app" className={LINK}>
+          Numerics
+        </a>
+        ,{" "}
+        <a
+          href="https://inference-tradeoffs-explained.vercel.app"
+          className={LINK}
+        >
+          Trade-offs
+        </a>
+        ) and Agents (
+        <a href="https://agent-harnesses-explained.vercel.app" className={LINK}>
+          Harnesses
+        </a>
+        ,{" "}
+        <a href="https://agent-protocols-explained.vercel.app" className={LINK}>
+          Protocols
+        </a>
+        ,{" "}
+        <a href="https://agent-context-explained.vercel.app" className={LINK}>
+          Context
+        </a>
+        ,{" "}
+        <a
+          href="https://agent-orchestration-explained.vercel.app"
+          className={LINK}
+        >
+          Orchestration
+        </a>
+        ,{" "}
+        <a href="https://agent-evals-explained.vercel.app" className={LINK}>
+          Evals
+        </a>
+        , <strong className="font-medium">Security</strong>). It is the sixth of
+        the six agent sites. How this one was built, and how to check it:{" "}
         <Link href="/about" className={LINK}>
           about
         </Link>
