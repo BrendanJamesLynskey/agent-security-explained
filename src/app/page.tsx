@@ -6,6 +6,7 @@ import { SECTIONS } from "@/lib/mdx/sections";
 import { formatValue, lookup } from "@/lib/security/values";
 import { ENGINE_URL } from "@/lib/site";
 import { CIRCLE_COLOUR, DECISION_COLOUR } from "@/lib/viz/palette";
+import { ReadingOrder } from "@/components/ui/ReadingOrder";
 
 const LINK =
   "focus-ring rounded underline decoration-accent/40 underline-offset-4 hover:decoration-accent";
@@ -140,6 +141,7 @@ export default function HomePage(): JSX.Element {
           {v("fr.adaptive.none.risk", "pct1")}. No language model runs anywhere.
         </p>
       </section>
+      <ReadingOrder current="security" />
       <nav aria-label="Chapters" className="mt-12 grid gap-4 sm:grid-cols-2">
         {SECTIONS.map((s, i) => (
           <Link
