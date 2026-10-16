@@ -9,12 +9,13 @@ import { MdxTable } from "@/components/ui/MdxTable";
 import { P, type Obj } from "@/lib/engine";
 import { tree } from "@/lib/security/values";
 import { ARXIV, ENGINE_URL, PAPERS, repoFile } from "@/lib/site";
+import { withShare } from "@/lib/share";
 
-export const metadata = {
+export const metadata = withShare("/data", {
   title: "Data",
   description:
     "The policy engine's recorded run: every task's decisions in a classic agent and planned in advance, the trifecta check against an exhaustive search, least privilege, sandbox layers, layered detectors, plan-then-execute, approval thresholds, every defence's cost and risk on the benign suite, the checklist, and the published measurements the chapters quote.",
-};
+});
 
 const A =
   "focus-ring rounded text-accent underline underline-offset-2 dark:text-indigo-300";

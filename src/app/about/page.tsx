@@ -22,12 +22,13 @@ import {
   PROTOCOLS_URL,
   repoFile,
 } from "@/lib/site";
+import { withShare } from "@/lib/share";
 
-export const metadata = {
+export const metadata = withShare("/about", {
   title: "About",
   description:
     "What Agent Security Explained's policy engine computes, how it is tested (lattice laws, soundness on every small plan, an exhaustive search behind the trifecta check, the cost-and-risk model against simulation), what is illustrative, and how Python and the browser are checked to agree exactly.",
-};
+});
 
 const A =
   "focus-ring rounded text-accent underline underline-offset-2 dark:text-indigo-300";
@@ -105,7 +106,7 @@ export default function AboutPage(): JSX.Element {
           ) are quoted from their papers, each checked at export.arxiv.org.
         </p>
 
-        <h2>The engine, and how it is tested</h2>
+        <h2 id="engine">The engine, and how it is tested</h2>
         <p>
           The engine is{" "}
           <a href={ENGINE_URL} className={A}>
