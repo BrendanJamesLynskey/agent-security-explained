@@ -13,7 +13,7 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
-import { SHARE } from "@/lib/share";
+import { SHARE, type Share } from "@/lib/share";
 
 import { Glyph, Motif } from "./motif";
 
@@ -30,16 +30,19 @@ const BG = "#0b1020";
 
 export type CardChapter = { number: number; title: string };
 
-export async function card(chapter?: CardChapter): Promise<ImageResponse> {
+export async function card(
+  chapter?: CardChapter,
+  share: Share = SHARE,
+): Promise<ImageResponse> {
   const [bold, regular, mono] = await Promise.all([
     font("NotoSans-Bold.ttf"),
     font("NotoSans-Regular.ttf"),
     font("NotoSansMono-Bold.ttf"),
   ]);
-  const c = SHARE.color;
-  const host = SHARE.url.replace(/^https:\/\//, "");
-  const big = chapter ? chapter.title : SHARE.name;
-  const size = big.length > 34 ? 60 : big.length > 24 ? 68 : 78;
+  const c = share.color;
+  const host = share.url.replace(/^https:\/\//, "");
+  const big = chapter ? chapter.title : share.name;
+  const size = big.length > 26 ? 60 : big.length > 22 ? 68 : 78;
   return new ImageResponse(
     <div
       style={{
@@ -74,7 +77,8 @@ export async function card(chapter?: CardChapter): Promise<ImageResponse> {
               whiteSpace: "nowrap",
             }}
           >
-            {SHARE.track ? `${SHARE.track.toUpperCase()} TRACK` : "STUDY"}
+            {share.kicker ??
+              (share.track ? `${share.track.toUpperCase()} TRACK` : "")}
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
@@ -88,7 +92,7 @@ export async function card(chapter?: CardChapter): Promise<ImageResponse> {
                 marginBottom: 14,
               }}
             >
-              {`CHAPTER ${String(chapter.number).padStart(2, "0")} · ${SHARE.name}`}
+              {`CHAPTER ${String(chapter.number).padStart(2, "0")} · ${share.name}`}
             </div>
           )}
           <div
@@ -111,7 +115,7 @@ export async function card(chapter?: CardChapter): Promise<ImageResponse> {
               color: MUTED,
             }}
           >
-            {SHARE.claim}
+            {share.claim}
           </div>
         </div>
         <div
@@ -142,7 +146,7 @@ export async function card(chapter?: CardChapter): Promise<ImageResponse> {
               color: MUTED,
             }}
           >
-            {SHARE.checkedShort}
+            {share.checkedShort}
           </div>
         </div>
       </div>

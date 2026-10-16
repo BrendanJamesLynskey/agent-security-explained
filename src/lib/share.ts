@@ -8,26 +8,39 @@ import type { Metadata } from "next";
 
 import { SITE_URL } from "@/lib/site";
 
-export const SHARE = {
-  name: "Agent Security Explained",
+export type Share = {
+  name: string;
   /** The track in the site menu (null: the site sits outside the four tracks). */
-  track: "Agents" as string | null,
+  track: string | null;
+  /** The card's top line, when it is not "<TRACK> TRACK". */
+  kicker?: string;
   /** The one-line claim under the name on the card. */
-  claim: "Agents that stay safe by design",
+  claim: string;
   /** How the site is checked, in one line (from the About page). */
+  checkedShort: string;
+  /** The site's colour on its card and favicon. */
+  color: string;
+  url: string;
+  description: string;
+};
+
+export const SHARE: Share = {
+  name: "Agent Security Explained",
+  track: "Agents",
+  claim: "Agents that stay safe by design",
   checkedShort:
     "Trifecta check equals an exhaustive search on all 256 tool subsets; TS engine matches Python exactly",
-  /** The site's colour on its card and favicon. */
   color: "#0e7490",
   url: SITE_URL,
   description:
     "How to build agents that stay safe: trust boundaries, labels on every value, untrusted input, the lethal trifecta, least privilege and scoped credentials, sandboxing, detection, structural designs, humans in the loop and the security–utility frontier, each animated by a tested policy engine. Defences only.",
-} as const;
+};
 
 /** `m` plus Open Graph and Twitter tags for the page at `path` (titled as `m` titles it). */
 export function withShare<M extends Metadata>(
   path: string,
   m: M,
+  share: Share = SHARE,
 ): M & Pick<Metadata, "openGraph" | "twitter"> {
   const t = m.title;
   const own =
@@ -37,16 +50,18 @@ export function withShare<M extends Metadata>(
         ? t.absolute
         : null;
   const title =
-    own && own !== SHARE.name ? `${own} · ${SHARE.name}` : SHARE.name;
+    own && !own.endsWith(share.name)
+      ? `${own} · ${share.name}`
+      : (own ?? share.name);
   const description =
-    typeof m.description === "string" ? m.description : SHARE.description;
+    typeof m.description === "string" ? m.description : share.description;
   return {
     ...m,
     openGraph: {
       title,
       description,
       url: path,
-      siteName: SHARE.name,
+      siteName: share.name,
       type: path === "/" ? "website" : "article",
       locale: "en_GB",
     },
