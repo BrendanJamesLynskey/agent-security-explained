@@ -9,12 +9,16 @@
 
 When the policy cannot decide, it asks: "private data would leave to a colleague: allow?" A person at the gate is a strong defence, because they see the whole situation, and a weak one, because they get tired. Claude Code's engineers describe the problem plainly: “Constantly clicking "approve" slows down development cycles and can lead to ‘approval fatigue’, where users might not pay close attention to what they're approving”, and report that in their internal usage sandboxing “safely reduces permission prompts by 84%” ([Anthropic engineering, 2025-10-20](https://www.anthropic.com/engineering/claude-code-sandboxing), opened 2026-10-14). Fewer, better prompts are the goal.
 
+<span id="se-approvals" />
+
 The animation runs the label policy in a classic agent over the engine's suite of benign tasks (the first <V of="ap.frames" fmt="int" /> are shown, one per step; the totals cover all <V of="fr.n" fmt="int" />), and you choose who must approve:
 
 - **nobody**: the policy's asks are refused. No prompts at all, but only <V of="ap.refuse.utility" fmt="pct1" /> of the tasks finish.
 - **the policy's asks**: <V of="ap.policy.prompts" fmt="f2" /> prompts per task, and <V of="ap.policy.utility" fmt="pct1" /> finish. But the policy allows writes and sends that carry only public data, so a steered attempt still has an unchecked route in <V of="ap.policy.ungated" fmt="pct" /> of tasks: risk <V of="ap.policy.risk" fmt="pct1" /> per task.
 - **every write and send**: <V of="ap.consequential.prompts" fmt="f2" /> prompts per task, no unchecked route left, and the risk falls to <V of="ap.consequential.risk" fmt="pct1" />.
 - **every call**: <V of="ap.every.prompts" fmt="f2" /> prompts per task, and the risk goes **up** again, to <V of="ap.every.risk" fmt="pct1" />. Reads and summaries now ask too, so by the time a send comes up the person has already clicked several times, and each extra prompt makes a mistaken approval likelier.
+
+<span id="se-fatigue" />
 
 That last line is approval fatigue in the model: a mistaken approval is <V of="ap.fatigue.n1" fmt="pct" /> at a task's first prompt and <V of="ap.fatigue.n4" fmt="pct" /> at its fourth. The curve under the calls shows where each task sits on it. The lesson is the one the quote draws: put humans where only a human can judge (the writes and sends that carry data out), and make everything else safe without asking, with a sandbox ([chapter 5](/learn/05-sandboxing-and-egress)) or a plan ([chapter 7](/learn/07-designs-that-make-it-structural)).
 
@@ -58,3 +62,79 @@ export function approvalMiss(n: number, cfg: Obj = UTILITY): number {
 - [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se08-q1"
+  n={1}
+  choices={[
+    "Nobody",
+    "The policy's asks only",
+    "Every write and send",
+    "Every call",
+  ]}
+  answer={2}
+  q="Which approval setting leaves the lowest risk per task?"
+  href="#se-approvals"
+  more="Who must approve"
+>
+  Every write and send: no unchecked route is left, and there are few enough
+  prompts (<V of="ap.consequential.prompts" fmt="f2" /> per task) that each is
+  read.
+</Check>
+
+<Check
+  id="se08-q2"
+  n={2}
+  input="slider"
+  min={0}
+  max={20}
+  step={0.1}
+  of="ap.every.risk"
+  fmt="pct1"
+  abs={1}
+  q="Approve every call, reads included. What is the risk per task now?"
+  href="#se-approvals"
+  more="Who must approve"
+>
+  Higher than approving only writes and sends
+  (<V of="ap.consequential.risk" fmt="pct1" />): with
+  <V of="ap.every.prompts" fmt="f2" /> prompts per task, the person has
+  clicked several times before the send that matters.
+</Check>
+
+<Check
+  id="se08-q3"
+  n={3}
+  input="slider"
+  min={0}
+  max={100}
+  step={1}
+  of="ap.fatigue.n4"
+  fmt="pct"
+  abs={5}
+  q="A mistaken approval is 10% likely at a task's first prompt. How likely at its fourth?"
+  href="#se-fatigue"
+  more="Approval fatigue"
+>
+  Each further prompt keeps only part of the remaining attention, so the
+  miss rate climbs fast. The rates are illustrative; the shape is the point.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- A person at the gate is strong (they see the situation) and weak (they tire).
+- Put humans where only a human can judge: the writes and sends that carry data out.
+- More prompts do not mean more safety: fatigue makes each mistaken approval likelier.
+- Make everything else safe without asking, with a sandbox or a plan.
+
+<Keep>
+  Approving every write and send: risk
+  <V of="ap.consequential.risk" fmt="pct1" />; approving every call:
+  <V of="ap.every.risk" fmt="pct1" />.
+</Keep>
+
+</Remember>

@@ -9,10 +9,14 @@
 
 Every defence in this site has a price. The label policy blocks tasks the user wanted; approvals cost attention; detectors add model calls and flag some benign results; a planner adds a call and cannot do every task unattended. The engine measures the price and the protection **on the same tasks**: a suite of <V of="fr.n" fmt="int" /> benign tasks drawn with its seeded generator (each reads one to three sources, summarises them and answers, saves a file or sends a message; <V of="fr.adaptive_share" fmt="pct" /> branch on what they read). For each of <V of="fr.defences" fmt="int" /> defences it counts the tasks that finish, the prompts and the extra calls, and the chance that one steering attempt in a task's untrusted input ends in a write or send that nothing stops. Threats appear only as that abstract event.
 
+<span id="se-attackers" />
+
 The animation adds one defence per step to the plot: tasks finished across, risk up (on a log scale, so each gridline is ten times the last). A filled point is on the **frontier**: no other defence is at least as good on tasks finished, risk and prompts, and better on one. Switch the attacker:
 
 - **Fixed attacks**, the published rates: the detectors look best. Three layers leave a risk of <V of="fr.fixed.detectors.risk" fmt="pct2" /> per task and still finish <V of="fr.fixed.detectors.utility" fmt="pct1" /> of tasks, but those rates were measured against fixed sets of attacks ([chapter 6](/learn/06-detection-is-not-enough)).
 - **An attacker who adapts**, getting past every detector ([Zhan et al. 2025](https://arxiv.org/abs/2503.00061): over 50% success against all eight defences tested) at a <V of="fr.adaptive.base" fmt="pct" /> base rate: the detectors fall back to the undefended risk, <V of="fr.adaptive.detectors.risk" fmt="pct1" />. The designs that never read content do not move. The label policy alone leaves <V of="fr.adaptive.policy.risk" fmt="pct1" />; adding least privilege takes that to <V of="fr.adaptive.least.risk" fmt="pct1" /> **at no cost in tasks** (both finish <V of="fr.adaptive.least.utility" fmt="pct1" />); planning in advance with least privilege leaves <V of="fr.adaptive.planned.risk" fmt="pct1" /> and finishes <V of="fr.adaptive.planned.utility" fmt="pct1" />, with <V of="fr.adaptive.planned.prompts" fmt="f2" /> prompts and <V of="fr.adaptive.planned.extra" fmt="f2" /> extra call per task. Approving every write and send finishes everything and leaves <V of="fr.adaptive.approve_all.risk" fmt="pct1" />, paid in attention (<V of="fr.adaptive.approve_all.prompts" fmt="f2" /> prompts per task, with the fatigue of [chapter 8](/learn/08-humans-in-the-loop)).
+
+<span id="se-blocked" />
 
 What does the policy block? Every blocked task traces to one rule: a send carrying data from untrusted, private sources (an inbox) to anyone but the user, in <V of="fr.fixed.policy.by_rule.untrusted-egress-private" fmt="int" /> of the <V of="fr.n" fmt="int" /> tasks (<V of="fr.fixed.policy.blocked" fmt="pct1" />). A real deployment would make choices here, for example allowing colleagues as destinations and taking that risk back; the frontier is a menu of such choices, not a verdict. For scale: on AgentDojo, CaMeL kept <V of="fr.camel_ratio" fmt="pct" /> of the undefended system's solved tasks (<V of="pub.camel_secure" fmt="pct" /> against <V of="pub.camel_undefended" fmt="pct" />, [Debenedetti et al. 2025](https://arxiv.org/abs/2503.18813)); this suite's figures are not comparable with that, only the shape is.
 
@@ -53,3 +57,73 @@ if (
 - [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se09-q1"
+  n={1}
+  input="slider"
+  min={0}
+  max={100}
+  step={0.1}
+  of="fr.adaptive.detectors.risk"
+  fmt="pct1"
+  abs={5}
+  q="Against an attacker who adapts and gets past every detector, what risk per task do three detection layers leave?"
+  href="#se-attackers"
+  more="Two attackers"
+>
+  The undefended risk: detectors that are passed do nothing. Against fixed
+  attacks they looked best, at <V of="fr.fixed.detectors.risk" fmt="pct2" />.
+</Check>
+
+<Check
+  id="se09-q2"
+  n={2}
+  choices={[
+    "It blocks more benign tasks",
+    "None: it finishes as many tasks and lowers the risk",
+    "It doubles the prompts",
+  ]}
+  answer={1}
+  q="Adding least privilege to the label policy: what does it cost in tasks?"
+  href="#se-attackers"
+  more="Two attackers"
+>
+  Nothing: both finish <V of="fr.adaptive.least.utility" fmt="pct1" />, and
+  the risk falls from <V of="fr.adaptive.policy.risk" fmt="pct1" /> to
+  <V of="fr.adaptive.least.risk" fmt="pct1" />.
+</Check>
+
+<Check
+  id="se09-q3"
+  n={3}
+  input="number"
+  of="fr.fixed.policy.by_rule.untrusted-egress-private"
+  fmt="int"
+  q="Of the 120 benign tasks, how many does the label policy block?"
+  href="#se-blocked"
+  more="What the policy blocks"
+>
+  All by one rule: a send carrying data from untrusted, private sources to
+  anyone but the user. A deployment could allow colleagues and take that risk
+  back: the frontier is a menu, not a verdict.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- Every defence has a price: blocked tasks, prompts, extra calls, attention.
+- Measure price and protection on the same tasks, against fixed and adaptive attackers.
+- Defences that never read content do not move when the attacker adapts.
+- Least privilege lowers risk at no cost in tasks; it belongs in every design.
+
+<Keep>
+  Against an adaptive attacker, planning with least privilege left
+  <V of="fr.adaptive.planned.risk" fmt="pct1" /> risk and finished
+  <V of="fr.adaptive.planned.utility" fmt="pct1" /> of tasks.
+</Keep>
+
+</Remember>

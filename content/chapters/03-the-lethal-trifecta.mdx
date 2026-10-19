@@ -9,7 +9,11 @@
 
 Chapter 1's denied reply needed three things at once. Something **private** had to be in reach (the notes, the inbox). Something **untrusted** had to be read (the inbox, a web page), because that is what can steer the model. And there had to be a way to **send data out** (a message, a web request). [Simon Willison](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) named this combination the **lethal trifecta**: an agent that holds all three can be steered into leaking, and one that lacks any of them cannot leak this way, whatever text it reads.
 
+<span id="se-check" />
+
 The engine checks the claim instead of assuming it. For a set of tools, it puts each tool into the circles it belongs to (a read of private data, a read of untrusted data, a tool that can carry data to a destination not allowed to read private data). Separately, with no policy at all, it searches **every** sequence of up to three calls the agent could make for one that carries private data out under untrusted control. Over all <V of="tri.n" fmt="int" /> subsets of the engine's tools, <V of="tri.trifecta" fmt="int" /> hold all three circles, and the trifecta check and the exhaustive search agree on <V of="tri.agree" fmt="int" /> of <V of="tri.n" fmt="int" />.
+
+<span id="se-combos" />
 
 The animation steps through the eight combinations of three simple tools, one per circle. Only the last has a flow out, and on it the policy's decision is <V of="tri.all_decision" fmt="raw" /> (rule: <V of="tri.all_rule" fmt="raw" />). Then two agents with just one tool each in two circles: reading an inbox is both private and untrusted, so an inbox reader that can send messages is already a trifecta; and fetching web pages is both untrusted input and a way out, because the address requested leaves the system, so a page fetcher that can read the user's notes is one too. Use the buttons to add and remove circles yourself.
 
@@ -22,6 +26,8 @@ The circles are assigned from the abstract tools' declared labels; a real tool's
 </Callout>
 
 <Layer kind="maths">
+
+<span id="se-tri-maths" />
 
 Let $P$, $U$ and $O$ be the sets of held tools in each circle. A flow out needs a context that is both untrusted and private when an outbound call is made. In a classic agent the context is the join of everything read (chapter 2), so it reaches $(\text{untrusted}, \text{private})$ exactly when some read in $P$ and some read in $U$ have run (one tool may be in both), and an outbound tool in $O$ can then be called. Hence a flow out exists if and only if all three sets are non-empty, and two reads plus one send (three calls) always suffice, which is why the search stops at three.
 
@@ -50,3 +56,66 @@ export function trifecta(grant: Obj): Obj {
 - Meta's [Agents Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/) (2025): no more than two of untrustworthy inputs, sensitive data and changing state or communicating, in one session; set side by side with this site's checks in [chapter 10](/learn/10-a-builders-checklist).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se03-q1"
+  n={1}
+  input="number"
+  of="tri.trifecta"
+  fmt="int"
+  q="Of the 256 subsets of the engine's tools, how many hold all three circles: private data, untrusted input and a way out?"
+  href="#se-check"
+  more="The claim, checked"
+>
+  More than half. The exhaustive search for a flow out agrees with the
+  trifecta check on <V of="tri.agree" fmt="int" /> of
+  <V of="tri.n" fmt="int" /> subsets.
+</Check>
+
+<Check
+  id="se03-q2"
+  n={2}
+  choices={[
+    "No: it holds only two tools",
+    "Yes: an inbox is both private and untrusted",
+  ]}
+  answer={1}
+  q="An agent can only read the user's inbox and send messages. Is it a trifecta?"
+  href="#se-combos"
+  more="The combinations"
+>
+  Yes: one tool can sit in two circles. A web-page fetcher is both untrusted
+  input and a way out, because the address requested leaves the system.
+</Check>
+
+<Check
+  id="se03-q3"
+  n={3}
+  choices={["Two", "Three", "It depends on the text read"]}
+  answer={1}
+  q="If a flow out exists, how many calls does it take at most?"
+  href="#se-tri-maths"
+  more="Why three calls suffice"
+>
+  Three: a read in the private circle, a read in the untrusted circle (one
+  tool may be both), then an outbound call. That is why the exhaustive search
+  stops at three.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- The lethal trifecta: private data in reach, untrusted input read, and a way to send data out.
+- Hold all three and an agent can be steered into leaking; lack any one and it cannot leak this way.
+- One tool can sit in two circles: an inbox, a web fetcher.
+- Removing a circle is a structural defence: it needs no detection, only a task that does without the tool.
+
+<Keep>
+  Flow out ⇔ P ≠ ∅ ∧ U ≠ ∅ ∧ O ≠ ∅: check the circles before trusting
+  anything else.
+</Keep>
+
+</Remember>

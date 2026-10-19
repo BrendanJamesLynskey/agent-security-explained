@@ -7,6 +7,8 @@
 
 <Layer kind="concept">
 
+<span id="se-nine" />
+
 The chapters reduce to nine questions to ask of any agent design. Each is measured here, not answered by hand: choose a design in the animation (a defence from [chapter 9](/learn/09-the-frontier), whether every write and send needs approval, and which sandbox layers are on) and the engine audits it on the benign suite, against an adaptive attacker, one check per step.
 
 1. **Labels** ([chapter 1](/learn/01-trust-boundaries)): does every value carry where it came from and how secret it is, and is every call checked against a policy?
@@ -18,6 +20,8 @@ The chapters reduce to nine questions to ask of any agent design. Each is measur
 7. **Structure** ([chapter 7](/learn/07-designs-that-make-it-structural)): is the plan fixed before any untrusted data is read?
 8. **Humans** ([chapter 8](/learn/08-humans-in-the-loop)): are prompts few enough that each one is read?
 9. **The frontier** ([chapter 9](/learn/09-the-frontier)): is the design on the frontier, within a risk budget of <V of="ck.budget" fmt="pct" /> per task?
+
+<span id="se-default" />
 
 The default design (planning in advance with the label policy and least privilege, and all three sandbox layers) passes <V of="ck.passed" fmt="int" /> of the nine, finishing <V of="ck.utility" fmt="pct1" /> of the tasks with a risk of <V of="ck.risk" fmt="pct1" /> per task. Two checks warn, and both are honest. Check 2 is <V of="ck.verdict.ch2" fmt="raw" />: tasks that branch on what they read let untrusted data steer their last step, and the policy allows some of those calls. Check 3 is <V of="ck.verdict.ch3" fmt="raw" />: tasks that need private data, untrusted input and a send still hold all three; the policy denies the flow out, but the circles are there. Turn on approval for every write and send and check 2 becomes <V of="ck.approve.verdict.ch2" fmt="raw" />, while check 8 becomes <V of="ck.approve.verdict.ch8" fmt="raw" /> (<V of="ck.approve.prompts" fmt="f2" /> prompts per task). No design passes all nine on this suite: that is the frontier's lesson in another form. Try the others, from no defence at all to detectors alone, and follow each check back to its chapter.
 
@@ -70,3 +74,63 @@ verdict: d.mode === "dataflow" ? "pass" : d.policy ? "warn" : "fail",
 - [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/) and [LLM Hub: MCP](https://brendanjameslynskey.github.io/LLM_Hub_MCP/).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se10-q1"
+  n={1}
+  input="number"
+  of="ck.passed"
+  fmt="int"
+  q="The default design (planning in advance, the label policy, least privilege, all three sandbox layers) passes how many of the nine checks?"
+  href="#se-default"
+  more="The default design"
+>
+  It finishes <V of="ck.utility" fmt="pct1" /> of the tasks at a risk of
+  <V of="ck.risk" fmt="pct1" /> per task. The two warnings are honest: tasks
+  that branch on what they read, and tasks that hold all three circles.
+</Check>
+
+<Check
+  id="se10-q2"
+  n={2}
+  choices={["Yes, the default design", "Yes, with approvals on", "No design does"]}
+  answer={2}
+  q="Does any design pass all nine checks on this suite?"
+  href="#se-default"
+  more="The default design"
+>
+  No: fixing one check costs another. That is the frontier's lesson in
+  another form.
+</Check>
+
+<Check
+  id="se10-q3"
+  n={3}
+  choices={["Pass", "Warn", "Fail"]}
+  answer={1}
+  q="Turn on approval for every write and send. Check 2 becomes a pass; what does check 8 (prompts few enough to read) become?"
+  href="#se-default"
+  more="The default design"
+>
+  <V of="ck.approve.verdict.ch8" fmt="raw" />, at
+  <V of="ck.approve.prompts" fmt="f2" /> prompts per task: closing the
+  unchecked routes costs attention.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- Nine questions: labels, untrusted control, the trifecta, least privilege, the sandbox, detection, structure, humans, the frontier.
+- Each is measured on a suite of benign tasks, not answered by hand.
+- No design passes all nine: every fix has a price somewhere else.
+- The checks map onto the published frameworks (OWASP Agentic Top 10, Rule of Two, Fides, NIST AI RMF).
+
+<Keep>
+  The default design passes <V of="ck.passed" fmt="int" /> of 9 checks within a
+  <V of="ck.budget" fmt="pct" /> risk budget per task.
+</Keep>
+
+</Remember>

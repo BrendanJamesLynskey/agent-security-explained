@@ -9,7 +9,11 @@
 
 Chapters 1 to 5 put defences where the labels say data crosses a boundary. The other family of defences tries to **recognise** a steering attempt: mark untrusted text so the model can tell it apart (Spotlighting's provenance marking, [Hines et al. 2024](https://arxiv.org/abs/2403.14720)), run a classifier over each tool result, check the model's output before it acts. Each is a filter, and each misses some attempts. Stacking them helps, because an attempt must get past every layer, so the misses multiply.
 
+<span id="se-layers-miss" />
+
 The animation draws <V of="dp.n" fmt="int" /> attempts arriving in untrusted results. At the published base rate (<V of="dp.base" fmt="pct" />, InjecAgent's ReAct GPT-4 figure, [Zhan et al. 2024](https://arxiv.org/abs/2403.02691)) about a quarter of them would steer an undefended model. Then three layers are added: provenance marking, which misses <V of="dp.miss.marking" fmt="pct" /> (the ratio of Spotlighting's published bounds, below 2% from above 50%), an input classifier that misses <V of="dp.miss.classifier" fmt="pct" /> and an output check that misses <V of="dp.miss.output_check" fmt="pct" />. If the layers miss independently, all three miss <V of="dp.independent" fmt="pct2" /> of attempts, and end to end <V of="dp.t.c0k3.end_to_end" fmt="pct2" /> get through. That is a large reduction, and it is **not zero**: over <V of="dp.attempts" fmt="int" /> attempts, the chance that at least one gets through is <V of="dp.t.c0k3.any_of_n" fmt="pct" />.
+
+<span id="se-blind" />
 
 Real layers do not miss independently. Detectors trained on similar data, or reading the same rewritten text, share blind spots: some attempts evade them all at once. Choose a shared blind spot in the animation. With just <V of="dp.t.c0.01k3.c" fmt="pct" /> of attempts evading every layer together, all three miss <V of="dp.t.c0.01k3.all_miss" fmt="pct2" />, about five times the independent figure, and the chance that one of <V of="dp.attempts" fmt="int" /> gets through rises to <V of="dp.t.c0.01k3.any_of_n" fmt="pct" />. A blind spot every layer shares is a floor that no extra layer can lower.
 
@@ -54,3 +58,72 @@ export function allMissCommon(m: number[], c: number): number {
 - [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se06-q1"
+  n={1}
+  input="number"
+  of="dp.independent"
+  fmt="pct2"
+  q="Three detection layers miss 4%, 20% and 30% of attempts, independently. What share of attempts do all three miss, in percent?"
+  href="#se-layers-miss"
+  more="Layers multiply"
+>
+  The product of the miss rates. A large reduction, and not zero: end to end
+  <V of="dp.t.c0k3.end_to_end" fmt="pct2" /> of attempts get through.
+</Check>
+
+<Check
+  id="se06-q2"
+  n={2}
+  input="slider"
+  min={0}
+  max={100}
+  step={1}
+  of="dp.t.c0k3.any_of_n"
+  fmt="pct"
+  abs={5}
+  q="Over 1,000 attempts, with those independent layers, what is the chance that at least one gets through?"
+  href="#se-layers-miss"
+  more="Layers multiply"
+>
+  A small rate per attempt becomes a likely event over many attempts:
+  $1 - (1 - \text{rate})^N$ tends to 1 as $N$ grows.
+</Check>
+
+<Check
+  id="se06-q3"
+  n={3}
+  input="slider"
+  min={0}
+  max={100}
+  step={1}
+  of="dp.t.c0.01k3.any_of_n"
+  fmt="pct"
+  abs={5}
+  q="Now let 1% of attempts evade every layer together (a shared blind spot). The chance one of 1,000 gets through?"
+  href="#se-blind"
+  more="Shared blind spots"
+>
+  All three now miss <V of="dp.t.c0.01k3.all_miss" fmt="pct2" />, about
+  <V v="ch06.blindOverIndependent" fmt="num" /> times the independent figure.
+  A blind spot every layer shares is a floor no extra layer can lower.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- Detection defences recognise steering attempts; each misses some, and stacking them multiplies the misses.
+- Real layers share blind spots, which set a floor no extra layer lowers.
+- Published rates are against fixed attacks; adaptive attackers have bypassed every defence tested.
+- Detection is worth having as one layer, never as the whole answer.
+
+<Keep>
+  A shared blind spot of <V of="dp.t.c0.01k3.c" fmt="pct" /> raised the
+  all-miss rate <V v="ch06.blindOverIndependent" fmt="num" />-fold.
+</Keep>
+
+</Remember>

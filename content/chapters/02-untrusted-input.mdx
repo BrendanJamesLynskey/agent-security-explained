@@ -11,6 +11,8 @@ A language model reads one stream of tokens. The user's request, the system's in
 
 It is measured, not hypothetical. InjecAgent ([Zhan et al. 2024](https://arxiv.org/abs/2403.02691)) built <V of="pub.injecagent_cases" fmt="int" /> test cases across tool-using agents; a ReAct-prompted GPT-4 agent was steered in <V of="pub.injecagent_react_gpt4" fmt="pct" /> of them, and reinforcing the injected text nearly doubled that. AgentDojo ([Debenedetti et al. 2024](https://arxiv.org/abs/2406.13352)) has <V of="pub.agentdojo_tasks" fmt="int" /> realistic tasks and <V of="pub.agentdojo_cases" fmt="int" /> security test cases, and its authors found it a challenge for attacks and defences alike: the attacks they ran broke some security properties but not all. Prompting defences help: marking which text came from where (Spotlighting, [Hines et al. 2024](https://arxiv.org/abs/2403.14720)) cut attack success from <V of="pubtext.spotlighting_base" fmt="raw" /> to <V of="pubtext.spotlighting_with" fmt="raw" /> in its experiments. But a lower rate is not zero ([chapter 6](/learn/06-detection-is-not-enough) does the arithmetic), so this site assumes the worst: **once a model has read untrusted text, anything it decides next may be the untrusted text's decision.**
 
+<span id="se-classic-planned" />
+
 The animation shows what that assumption does. In a **classic agent** the model reads every result before choosing the next call, so the **control** label of each call is the join of everything returned so far. In the task "send a colleague a summary of my notes, after looking up a page", the page lookup is already private-controlled (the model has read the notes, so the address it requests could carry them) and goes to the user for approval; after the page comes back, every later choice is untrusted and private, and the final send is <V of="plan.notes_then_page.classic_last" fmt="raw" />. **Planned in advance**, the calls are fixed from the request alone and only the plan's arguments carry labels: the summary is made from the notes only, so the send carries trusted private data and goes for approval (<V of="plan.notes_then_page.planned_last" fmt="raw" />), and the page lookup is just allowed. Same task, same policy; what changed is what the decisions depend on.
 
 </Layer>
@@ -30,6 +32,8 @@ c_k = \ell(\text{request}) \sqcup \bigsqcup_{j<k} \ell(r_j),
 $$
 
 which can only rise with $k$: one untrusted result makes every later control label untrusted. Planned in advance, $c_k = \ell(\text{request})$ for every $k$, and a call's effective label is the join over its **explicit** arguments only. The engine's tests compute every call's label a second way, by tracing each value back to the reads it came from (its provenance), on every plan of up to three calls, and require the two to agree.
+
+<span id="se-not-trust" />
 
 Plan-then-execute does not make the model trustworthy: a value derived from untrusted data is still untrusted, and the policy still applies to it. What it removes is untrusted **control**: no text the agent reads can add a call, remove one, or change where a result goes. [Beurer-Kellner et al. (2025)](https://arxiv.org/abs/2506.08837) list it among six design patterns with this property; [chapter 7](/learn/07-designs-that-make-it-structural) returns to them.
 
@@ -53,3 +57,70 @@ const control: L.Label =
 - [LLM Hub: Computer Use](https://brendanjameslynskey.github.io/LLM_Hub_Computer_Use/): browser and computer-use agents, which read the most untrusted text of all.
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se02-q1"
+  n={1}
+  choices={[
+    "Only the next call",
+    "Every later call in the run",
+    "None, if the text looks harmless",
+  ]}
+  answer={1}
+  q="In a classic agent the model reads one untrusted result. Whose control label becomes untrusted?"
+  href="#se-classic-planned"
+  more="Classic and planned"
+>
+  Every later call: the control label is the join of everything returned so
+  far, so it can only rise. The site assumes the worst: once untrusted text is
+  read, anything decided next may be its decision.
+</Check>
+
+<Check
+  id="se02-q2"
+  n={2}
+  choices={["Allow", "Ask the user", "Deny"]}
+  answer={1}
+  q="Planned in advance, 'send a colleague a summary of my notes, after looking up a page': what happens to the final send?"
+  href="#se-classic-planned"
+  more="Classic and planned"
+>
+  <V of="plan.notes_then_page.planned_last" fmt="raw" />: the summary is made
+  from the notes only, trusted and private, so it goes for approval. The
+  classic agent's send is <V of="plan.notes_then_page.classic_last" fmt="raw" />.
+</Check>
+
+<Check
+  id="se02-q3"
+  n={3}
+  choices={[
+    "Yes: a planned agent's values are all trusted",
+    "No: derived values keep their labels; only untrusted control is removed",
+  ]}
+  answer={1}
+  q="Does planning in advance make data read from an untrusted source trustworthy?"
+  href="#se-not-trust"
+  more="What planning removes"
+>
+  No. What it removes is untrusted control: no text the agent reads can add a
+  call, remove one, or change where a result goes. The policy still applies to
+  every value.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- A model reads one stream: nothing marks which tokens are instructions and which are data.
+- Assume the worst: after reading untrusted text, the model's next decisions may be that text's.
+- Published defences lower the rate of steering; a lower rate is not zero.
+- Planning the calls from the request alone removes untrusted control; the labels still apply.
+
+<Keep>
+  Classic: control is the join of everything read so far. Planned: control
+  is the request's label.
+</Keep>
+
+</Remember>
