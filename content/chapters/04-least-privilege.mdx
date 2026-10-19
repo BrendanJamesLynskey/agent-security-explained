@@ -9,7 +9,11 @@
 
 **Least privilege** is the oldest rule in security: give each piece of a system only the access it needs. For an agent the unit is the **task**. Before it runs, work out from its plan which tools it calls, which permission scopes those calls need, and which destinations it sends to, and grant exactly that. Anything outside the grant is denied by a rule that needs no detection and no judgement.
 
+<span id="se-grants" />
+
 The animation runs one task, summarising the user's notes into a file, under two grants. The **broad** grant holds all <V of="priv.broad_tools" fmt="int" /> tools, every scope and every destination; the task needs <V of="priv.task_tools" fmt="int" /> (<V of="priv.task_list" fmt="raw" />), so <V of="priv.unneeded" fmt="int" /> tools sit in the broad grant unused, including every tool that reads untrusted data and both ways to send data out (chapter 3's circles). The last call, sending the notes to an outside address, is not part of the task. Under the broad grant the only thing in its way is a rule about private data, which leaves it to the user to approve (<V of="priv.extra_broad" fmt="raw" />; here the user refuses). Under least privilege it is <V of="priv.extra_task" fmt="raw" />, for <V of="priv.extra_task_rules" fmt="int" /> separate reasons: the tool is not granted, its scope is not granted, the destination is not granted, and private data would leave.
+
+<span id="se-tokens" />
 
 The same idea applies to credentials. Each server an agent calls gets its own **token**, minted for that server (its **audience**) with only the scopes the task needs there: the broad grant mints <V of="priv.broad_tokens" fmt="int" /> tokens, least privilege <V of="priv.task_tokens" fmt="int" />. A token presented anywhere else is refused: <V of="priv.passthrough" fmt="raw" />. The MCP authorisation spec makes this a requirement: servers "MUST validate that access tokens were issued specifically for them as the intended audience" ([MCP 2026-07-28, authorisation](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization), using [RFC 8707](https://www.rfc-editor.org/rfc/rfc8707) resource indicators), and its [security best practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices) call passing a client's token through to another service an anti-pattern (opened 2026-10-14).
 
@@ -47,3 +51,64 @@ if (!token.scopes.includes(spec.scope)) return { ok: false, reason: `the token l
 - [LLM Hub: MCP](https://brendanjameslynskey.github.io/LLM_Hub_MCP/).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se04-q1"
+  n={1}
+  input="number"
+  of="priv.unneeded"
+  fmt="int"
+  q="Summarising notes into a file needs three tools. How many tools does the broad grant hold that the task never uses?"
+  href="#se-grants"
+  more="Two grants"
+>
+  Including every tool that reads untrusted data and both ways to send data
+  out: the broad grant hands the task all three circles of chapter 3.
+</Check>
+
+<Check
+  id="se04-q2"
+  n={2}
+  input="number"
+  of="priv.extra_task_rules"
+  fmt="int"
+  q="Under least privilege, an extra send of the notes to an outside address is denied. By how many separate rules?"
+  href="#se-grants"
+  more="Two grants"
+>
+  The tool is not granted, its scope is not granted, the destination is not
+  granted, and private data would leave. Under the broad grant only the last
+  rule stands in the way, and it only asks.
+</Check>
+
+<Check
+  id="se04-q3"
+  n={3}
+  choices={["Accepted: it is a valid token", "Rejected: wrong audience"]}
+  answer={1}
+  q="A token minted for notes-api is presented to mail-api. What does mail-api do?"
+  href="#se-tokens"
+  more="Tokens with one audience"
+>
+  Rejected: a server must accept only tokens issued for it, as the MCP
+  authorisation spec requires. Passing a client's token through to another
+  service is an anti-pattern.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- Grant each task exactly the tools, scopes and destinations its plan uses.
+- Anything outside the grant is denied by a rule that needs no detection.
+- Each server gets its own token, for its own audience, with only the scopes needed there.
+- Least privilege bounds what a steered agent can do, not what it will try.
+
+<Keep>
+  With the task's grant the agent holds only private data and a local write:
+  no flow out exists at all, whatever it reads.
+</Keep>
+
+</Remember>

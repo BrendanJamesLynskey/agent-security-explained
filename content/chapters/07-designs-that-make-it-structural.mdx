@@ -11,7 +11,11 @@
 
 The **dual-model pattern** ([Willison 2023](https://simonwillison.net/2023/Apr/25/dual-llm-pattern/)) splits the agent in two. A **privileged** model plans and calls tools but never reads untrusted content; a **quarantined** model reads untrusted content but has no tools, and its outputs come back as variables the privileged model refers to by name only. **CaMeL** ([Debenedetti et al. 2025](https://arxiv.org/abs/2503.18813)) makes this precise: the planner writes the whole plan as a program from the user's request, an interpreter runs it and tracks where every value came from, and a policy checks each tool call against those labels, so "the untrusted data retrieved by the LLM can never impact the program flow". [Beurer-Kellner et al. (2025)](https://arxiv.org/abs/2506.08837) collect six such patterns (plan-then-execute and the dual model among them) and weigh what each gives up.
 
+<span id="se-planned" />
+
 The animation runs a task this way. The planner reads the request and writes the plan; each read runs as a tool, and its result goes into a variable the planner never sees (the panel lists what it does see: names). Rewriting untrusted values happens in the quarantined model. At every call the policy decides on the labels the interpreter holds, and beside it is the decision a classic agent gets for the same call. For "send a colleague a summary of my notes, after looking up a page", the planned run allows, asks and denies <V of="du.notes_then_page.planned.allow" fmt="int" />, <V of="du.notes_then_page.planned.ask" fmt="int" /> and <V of="du.notes_then_page.planned.deny" fmt="int" /> calls, where the classic agent's are <V of="du.notes_then_page.classic.allow" fmt="int" />, <V of="du.notes_then_page.classic.ask" fmt="int" /> and <V of="du.notes_then_page.classic.deny" fmt="int" />: the page cannot taint a summary that was never made from it.
+
+<span id="se-not" />
 
 Two things the design does **not** do. It does not clean data: in "read my inbox and notes, then reply to a colleague" the reply is still made from untrusted, private text, and the policy denies it in both agents (<V of="du.reply_from_notes.planned.deny" fmt="int" /> denial each). And some tasks really do depend on what they read. In "file a ticket's summary wherever its category says", the plan has to branch on the ticket's content. The engine records the branch (the step's `ctrl`), so the write's control is the ticket's label, untrusted, and the policy sends it for approval: the dependency is tracked, not hidden. The price of the design is one extra model call per task to write the plan (<V of="du.notes_then_page.extra" fmt="int" /> here), and the tasks it can no longer do unattended. On the AgentDojo benchmark, CaMeL solved <V of="pub.camel_secure" fmt="pct" /> of tasks with provable security, against <V of="pub.camel_undefended" fmt="pct" /> for the undefended system.
 
@@ -53,3 +57,68 @@ const missing = [...(st.args as string[]), ...ctrl].filter((a) => !(a in vals));
 - Fides ([Costa et al. 2025](https://arxiv.org/abs/2505.23643)): a planner that tracks confidentiality and integrity labels and enforces policies deterministically, evaluated on AgentDojo; mapped with OWASP's and NIST's frameworks in [chapter 10](/learn/10-a-builders-checklist).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se07-q1"
+  n={1}
+  input="number"
+  of="du.notes_then_page.planned.deny"
+  fmt="int"
+  abs={0.5}
+  q="'Send a colleague a summary of my notes, after looking up a page', planned: how many of its calls does the policy deny?"
+  href="#se-planned"
+  more="A planned run"
+>
+  None, where the classic agent has
+  <V of="du.notes_then_page.classic.deny" fmt="int" /> denied: the page cannot
+  taint a summary that was never made from it.
+</Check>
+
+<Check
+  id="se07-q2"
+  n={2}
+  choices={[
+    "Allowed: the plan came from the user",
+    "Still denied: the data itself is untrusted and private",
+  ]}
+  answer={1}
+  q="'Read my inbox and notes, then reply to a colleague', planned in advance. The reply?"
+  href="#se-not"
+  more="What the design does not do"
+>
+  Still denied. Planning does not clean data: the reply is made from
+  untrusted, private text, and the policy denies it in both agents.
+</Check>
+
+<Check
+  id="se07-q3"
+  n={3}
+  input="number"
+  of="du.notes_then_page.extra"
+  fmt="int"
+  q="What does the design cost in extra model calls per task, here?"
+  href="#se-not"
+  more="What the design does not do"
+>
+  One, to write the plan, and the tasks that must branch on what they read
+  can no longer run unattended: the branch is tracked, and the call goes for
+  approval.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- The dual-model pattern: a privileged planner that never reads untrusted content, a quarantined reader with no tools.
+- CaMeL: the plan is a program written from the request; an interpreter tracks every value's label.
+- A planned call is never more restricted than the same call in a classic agent.
+- It does not clean data, and tasks that branch on what they read still need approval.
+
+<Keep>
+  Arrange the agent so untrusted text cannot choose what it does, and nothing
+  has to recognise that text.
+</Keep>
+
+</Remember>

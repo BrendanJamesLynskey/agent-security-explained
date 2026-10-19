@@ -9,7 +9,11 @@
 
 The policy of chapters 1 to 4 decides which **calls** an agent may make. A sandbox works one level down: it limits what a tool's **process** can do once it runs, whatever the call asked for. That matters most for tools that run code (a shell, a test runner, a package installer), because code can do anything its process is allowed to.
 
+<span id="se-layers" />
+
 The animation puts one such process inside three layers, each drawn as a boundary. The **file-system scope** limits file access to the workspace. A **container** gives the process its own file system and process space with only the workspace mounted, so the user's home directory is invisible and a process it starts stays inside. A **network allow-list** at the host's edge lets connections reach only the package registry. The process tries <V of="consts.actions" fmt="int" /> actions; the task (run the tests, install a package) needs <V of="sb.needed" fmt="int" /> of them.
+
+<span id="se-residual" />
 
 With no sandbox all <V of="sb.f0.open" fmt="int" /> unneeded actions get through. Each layer closes some: the file scope stops reading the home directory and writing system files, the container also stops a process escaping to the host, and the allow-list stops connections to any other host. With all three on, <V of="sb.f3.stopped" fmt="int" /> of the unneeded actions are stopped, the task still works, and <V of="sb.f3.open" fmt="int" /> gets through: an **upload to the allow-listed registry**. The allow-list checks where a connection goes, not what it carries, so any destination that accepts writes is a way out. Claude Code's sandboxing documentation makes the same point: "Allowing broad domains such as github.com can create paths for data exfiltration", and "Effective sandboxing requires both filesystem and network isolation" ([Claude Code docs, sandboxing](https://code.claude.com/docs/en/sandboxing), opened 2026-10-14). That residual is what the label policy of chapter 1 covers: it sees the data, not the connection. Turn layers off to see which actions each one alone would stop.
 
@@ -47,3 +51,68 @@ if (lid === "egress") {
 - [LLM Hub: Agents](https://brendanjameslynskey.github.io/LLM_Hub_Agents/).
 
 </Callout>
+
+<CheckYourself>
+
+<Check
+  id="se05-q1"
+  n={1}
+  input="number"
+  of="sb.f0.open"
+  fmt="int"
+  q="With no sandbox, how many of the process's unneeded actions get through?"
+  href="#se-layers"
+  more="Three layers"
+>
+  All of them: code can do anything its process is allowed to. The task
+  itself needs only <V of="sb.needed" fmt="int" /> of the actions.
+</Check>
+
+<Check
+  id="se05-q2"
+  n={2}
+  input="number"
+  of="sb.f3.open"
+  fmt="int"
+  q="With the file scope, the container and the network allow-list all on, how many unneeded actions still get through?"
+  href="#se-residual"
+  more="What still gets through"
+>
+  One, and the task still works. A sandbox is judged by two counts: the
+  unneeded actions still open, and the needed ones it breaks.
+</Check>
+
+<Check
+  id="se05-q3"
+  n={3}
+  choices={[
+    "Reading the home directory",
+    "An upload to the allow-listed registry",
+    "Escaping to the host",
+  ]}
+  answer={1}
+  q="Which action is that?"
+  href="#se-residual"
+  more="What still gets through"
+>
+  The allow-list checks where a connection goes, not what it carries, so any
+  allowed destination that accepts writes is a way out. The label policy,
+  which sees the data, covers that residual.
+</Check>
+
+</CheckYourself>
+
+<Remember>
+
+- A sandbox limits what a tool's process can do, whatever the call asked for.
+- File scope, container and network allow-list each close different actions; together they overlap.
+- An allow-list checks the destination, not the payload: an allowed host that accepts writes is a way out.
+- Sandboxing needs both file-system and network isolation, configured from the task.
+
+<Keep>
+  All three layers stopped <V of="sb.f3.stopped" fmt="int" /> of
+  <V of="sb.f0.open" fmt="int" /> unneeded actions and broke none of the
+  needed ones.
+</Keep>
+
+</Remember>
